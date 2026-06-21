@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: wildland-dashboard
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt && python collector.py refresh || true
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 2 --threads 4 --timeout 90
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: SECRET_KEY
+        sync: false
+      - key: ACCESS_PIN
+        sync: false
+      - key: SESSION_HOURS
+        value: 24
+      - key: SOURCE_STATUS_URL
+        sync: false
+      - key: SOURCE_STATUS_BEARER_TOKEN
+        sync: false
+      - key: REFRESH_TOKEN
+        sync: false
+  - type: cron
+    name: wildland-dashboard-refresh
+    runtime: python
+    plan: free
+    region: oregon
+    schedule: '*/30 * * * *'
+    buildCommand: pip install -r requirements.txt
+    startCommand: python trigger_refresh.py
+    envVars:
+      - key: APP_BASE_URL
+        sync: false
+      - key: REFRESH_TOKEN
+        sync: false

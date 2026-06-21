@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Wildland Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Operational viewer</p>
+        <h1>Wildland Dashboard</h1>
+        <p class="subtle">Updated {{ snapshot.get('last_successful_dashboard_update') or snapshot.get('generated_at') }}</p>
+      </div>
+      <form method="post" action="{{ url_for('logout') }}">
+        <button class="ghost" type="submit">Log out</button>
+      </form>
+    </header>
+
+    <main class="page">
+      <section class="hero card card-hero">
+        <p class="status-pill {{ (snapshot.executive_summary.severity if snapshot.executive_summary is mapping else 'gray')|lower }}">{{ snapshot.executive_summary.posture if snapshot.executive_summary is mapping else 'Unknown' }}</p>
+        <h2>{{ snapshot.executive_summary.headline if snapshot.executive_summary is mapping else 'Wildland conditions overview' }}</h2>
+        <p>{{ snapshot.executive_summary.text if snapshot.executive_summary is mapping else 'No summary available.' }}</p>
+      </section>
+
+      <section class="grid two-up">
+        <article class="card">
+          <h3>Current posture</h3>
+          <p class="metric">{{ snapshot.current_wildland_posture.status }}</p>
+          <p>{{ snapshot.current_wildland_posture.explanation }}</p>
+          {% if snapshot.current_wildland_posture.supporting_factors %}
+          <ul class="compact-list">
+            {% for item in snapshot.current_wildland_posture.supporting_factors[:4] %}
+            <li>{{ item }}</li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        </article>
+
+        <article class="card">
+          <h3>What changed</h3>
+          {% set changes = snapshot.change_tracking['items'] if snapshot.change_tracking is mapping and 'items' in snapshot.change_tracking else [] %}
+          {% if snapshot.change_tracking.available and changes %}
+            <p class="subtle">Change window starts {{ snapshot.change_tracking.since }}</p>
+            <ul class="compact-list">
+              {% for item in changes[:5] %}
+              <li><strong>{{ item.severity|upper if item.severity else 'INFO' }}</strong> — {{ item.text }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p>No significant change items in the current snapshot.</p>
+          {% endif %}
+        </article>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h3>Operational fire weather</h3>
+          <span class="subtle">{{ snapshot.san_diego_fire_weather.red_flag_or_watch_status }}</span>
+        </div>
+        <p>{{ snapshot.san_diego_fire_weather.plain_language_summary }}</p>
+        {% set weather_items = snapshot.san_diego_fire_weather.operational_summary['items'] if snapshot.san_diego_fire_weather is mapping and snapshot.san_diego_fire_weather.operational_summary is mapping and 'items' in snapshot.san_diego_fire_weather.operational_summary else [] %}
+        <div class="stack weather-items">
+          {% for item in weather_items[:6] %}
+          <div class="mini-card">
+            <p class="mini-label">{{ item.label }}</p>
+            <p>{{ item.value }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h3>Priority incidents</h3>
+          <span class="subtle">{{ snapshot.priority_incidents|length }} tracked</span>
+        </div>
+        {% if snapshot.priority_incidents %}
+        <div class="stack incidents">
+          {% for incident in snapshot.priority_incidents %}
+          <article class="incident-card">
+            <div class="incident-head">
+              <div>
+                <h4>{{ incident.name }}</h4>
+                <p class="subtle">{{ incident.location }}{% if incident.county %} · {{ incident.county }}{% endif %}</p>
+              </div>
+              <span class="status-pill amber">{{ incident.incident_status }}</span>
+            </div>
+            <div class="incident-metrics">
+              <span>{{ incident.acreage }} acres</span>
+              <span>{{ incident.containment }}% contained</span>
+            </div>
+            <p>{{ incident.why_it_matters }}</p>
+            {% if incident.official_source_link %}
+            <p><a href="{{ incident.official_source_link }}" target="_blank" rel="noreferrer">Official source</a></p>
+            {% endif %}
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No incidents are present in the current snapshot.</p>
+        {% endif %}
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h3>Map</h3>
+          <span class="subtle">Tap markers for incident details</span>
+        </div>
+        <div id="incident-map" class="map"></div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h3>Sources & verification</h3>
+          <span class="subtle">{{ snapshot.source_and_verification_status.healthy_sources }} healthy · {{ snapshot.source_and_verification_status.delayed_or_failing_sources }} delayed/failing</span>
+        </div>
+        {% if snapshot.source_and_verification_status.warning %}
+        <div class="alert soft">{{ snapshot.source_and_verification_status.warning }}</div>
+        {% endif %}
+        <ul class="compact-list">
+          <li>Dashboard update: {{ snapshot.source_and_verification_status.last_successful_dashboard_update }}</li>
+          <li>CAL FIRE check: {{ snapshot.source_and_verification_status.last_successful_calfire_check or 'n/a' }}</li>
+          <li>NWS check: {{ snapshot.source_and_verification_status.last_successful_nws_check or 'n/a' }}</li>
+        </ul>
+      </section>
+    </main>
+
+    <script id="snapshot-data" type="application/json">{{ snapshot_json|safe }}</script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>

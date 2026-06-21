@@ -1,0 +1,637 @@
+{
+  "generated_at": "2026-06-21T22:01:06+00:00",
+  "last_successful_dashboard_update": "2026-06-21T22:01:06+00:00",
+  "executive_summary": {
+    "text": "Overall wildland posture is CRITICAL \u2014 1 active San Diego County incident(s) are verified; 1 active significant Southern California incident(s) are relevant to regional awareness; minimum forecast RH is about 8%, which meets dashboard critical-condition thresholds. The most concerning fire weather is in the Deserts zone (peak gusts near 18 mph and minimum RH around 8%). 2 priority incidents are active or evacuation-related; the closest is Echo Fire about 15 mi from the city. Heads up: 0 source(s) failed and 1 stale \u2014 some figures may be cached, so verify critical items against primary sources.",
+    "severity": "red",
+    "posture": "CRITICAL",
+    "generated_at": "2026-06-21T22:01:06+00:00",
+    "headline": "CRITICAL \u2014 Deserts zone most concerning"
+  },
+  "current_wildland_posture": {
+    "status": "CRITICAL",
+    "explanation": "CRITICAL because 1 active San Diego County incident(s) are verified; 1 active significant Southern California incident(s) are relevant to regional awareness; minimum forecast RH is about 8%, which meets dashboard critical-condition thresholds.",
+    "sd_count": 1,
+    "socal_significant_count": 1,
+    "red_flag_or_watch_status": "None active in NWS San Diego-related alert check",
+    "supporting_factors": [
+      "1 ACTIVE San Diego County incident(s) verified.",
+      "1 active significant Southern California incident(s) >=100 acres relevant to regional awareness.",
+      "Peak regional gust is about 24 mph, below the 30 mph elevated-condition dashboard threshold.",
+      "Minimum forecast RH is about 8%."
+    ],
+    "threshold_rules": [
+      "NORMAL: no active San Diego incident or NWS fire-weather alert, peak gust <30 mph, RH >25%.",
+      "ELEVATED: active San Diego incident, gust 30-39 mph, RH 16-25%, or significant active regional incident.",
+      "HIGH: Fire Weather Watch, active San Diego incident plus gust >=30 mph/RH <=25%, gust 40-49 mph, or RH <=15%.",
+      "CRITICAL: Red Flag Warning, or active San Diego incident plus Red Flag/Watch, gust >=50 mph, or RH <=10%.",
+      "Fully contained incidents are CONTAINED \u2014 MONITORING and do not elevate posture by themselves."
+    ]
+  },
+  "san_diego_fire_weather": {
+    "operational_summary": {
+      "title": "Operational Fire Weather Factors",
+      "primary_source": "NWS San Diego Fire Weather Planning Forecast + NWS Active Alerts + OSCC/GACC Fuels & Fire Danger",
+      "issued_at": "2026-06-21T19:39:00+00:00",
+      "last_verified_at": "2026-06-21T22:01:00+00:00",
+      "source_note": "Fields are displayed only from official/reliable sources. Haines/fuel values are not estimated when not published by the source.",
+      "items": [
+        {
+          "label": "Wind speed and direction",
+          "value": "Deserts Tonight: Winds northwest 12 to 22 mph with gusts to 35 mph.",
+          "source": "NWS SGX Fire Weather Planning Forecast",
+          "source_url": "https://api.weather.gov/products/676c0679-e510-436f-b664-35ec58c25dda",
+          "verified_at": "2026-06-21T22:01:00+00:00"
+        },
+        {
+          "label": "Expected wind shifts",
+          "value": "Coastal Tonight: becoming variable 2 to 5 mph; Inland Valleys Tonight: becoming variable 2 to 5 mph; Mountains Tonight: becoming north 6 to 12 mph after midnight",
+          "source": "NWS SGX Fire Weather Planning Forecast",
+          "source_url": "https://api.weather.gov/products/676c0679-e510-436f-b664-35ec58c25dda",
+          "verified_at": "2026-06-21T22:01:00+00:00"
+        },
+        {
+          "label": "Minimum RH",
+          "value": "Mountains Tuesday: 10 to 15 percent on desert slopes to 20 to 30 percent on coastal slopes.",
+          "source": "NWS SGX Fire Weather Planning Forecast",
+          "source_url": "https://api.weather.gov/products/676c0679-e510-436f-b664-35ec58c25dda",
+          "verified_at": "2026-06-21T22:01:00+00:00"
+        },
+        {
+          "label": "Overnight RH recovery",
+          "value": "Inland Valleys Tonight: 85 to 95 percent.",
+          "source": "NWS SGX Fire Weather Planning Forecast",
+          "source_url": "https://api.weather.gov/products/676c0679-e510-436f-b664-35ec58c25dda",
+          "verified_at": "2026-06-21T22:01:00+00:00"
+        },
+        {
+          "label": "Temperature",
+          "value": "Deserts Tuesday: 106 to 111.",
+          "source": "NWS SGX Fire Weather Planning Forecast",
+          "source_url": "https://api.weather.gov/products/676c0679-e510-436f-b664-35ec58c25dda",
+          "verified_at": "2026-06-21T22:01:00+00:00"
+        },
+        {
+          "label": "Fuel moisture conditions",
+          "value": "OSCC/GACC Fuels and Fire Danger source checked. NWS fire-weather forecast indicates drying concern: Mountains Tuesday minimum RH 10 to 15 percent on desert slopes to 20 to 30 percent on coastal slopes..",
+          "source": "OSCC/GACC Fuels & Fire Danger + NWS SGX",
+          "source_url": "https://gacc.nifc.gov/oscc/fuelsFireDanger.php",
+          "verified_at": "2026-06-21T22:01:00+00:00"
+        },
+        {
+          "label": "Red Flag Warnings",
+          "value": "None active in NWS San Diego-related alert check.",
+          "source": "NWS Active Alerts",
+          "source_url": "https://api.weather.gov/alerts/active?area=CA",
+          "verified_at": "2026-06-21T22:01:00+00:00"
+        },
+        {
+          "label": "Haines Index / atmospheric stability",
+          "value": "Not published in the latest NWS SGX Fire Weather Planning Forecast; dashboard does not estimate Haines Index.",
+          "source": "NWS SGX Fire Weather Planning Forecast",
+          "source_url": "https://api.weather.gov/products/676c0679-e510-436f-b664-35ec58c25dda",
+          "verified_at": "2026-06-21T22:01:00+00:00"
+        },
+        {
+          "label": "Lightning potential",
+          "value": "No thunderstorms/lightning mentioned in latest NWS SGX Fire Weather Planning Forecast; CWR max 2% among parsed San Diego regions.",
+          "source": "NWS SGX Fire Weather Planning Forecast",
+          "source_url": "https://api.weather.gov/products/676c0679-e510-436f-b664-35ec58c25dda",
+          "verified_at": "2026-06-21T22:01:00+00:00"
+        }
+      ],
+      "discussion": "Warming trend expected through midweek, with high temperatures 5 to 10 degrees warmer than average by Wednesday. Lowest daytime humidity for the deserts will fall to around 10 to 15 percent each afternoon with RH near 25-30 percent for inland valleys midweek. Additionally, the marine layer will get shallower, down to around 1000 ft in depth and low clouds will not spread as far inland during the nights and mornings. A stray shower or t-storm is possible over the mountains on Wednesday afternoon. Gradual cooling to near normal with the marine layer slowly getting deeper for Thursday into the end of the week.",
+      "source_links": [
+        {
+          "label": "NWS San Diego",
+          "url": "https://www.weather.gov/sgx/"
+        },
+        {
+          "label": "NWS Active Alerts",
+          "url": "https://api.weather.gov/alerts/active?area=CA"
+        },
+        {
+          "label": "NWS California Fire Weather",
+          "url": "https://www.weather.gov/wrh/CAFW"
+        },
+        {
+          "label": "NWS SGX Fire Weather Planning Forecast API",
+          "url": "https://api.weather.gov/products/types/FWF/locations/SGX"
+        },
+        {
+          "label": "OSCC Fuels / Fire Danger",
+          "url": "https://gacc.nifc.gov/oscc/fuelsFireDanger.php"
+        }
+      ]
+    },
+    "alerts": [],
+    "observations": [
+      {
+        "area_name": "Coronado",
+        "region": "Coastal",
+        "representative_area": "San Diego / Coastal Metro",
+        "wind_speed_mph": 10.0,
+        "wind_gust_mph": 18.412465472,
+        "relative_humidity_percent": 65,
+        "temperature_f": 71,
+        "primary_time_period": "2026-06-21T15:00:00-07:00 to 2026-06-22T02:00:00-07:00",
+        "heat_drying_summary": "next 12h temp range 63-71\u00b0F; peak sustained wind 10 mph. Minimum forecast RH about 65% in the next 12h.",
+        "source_link": "https://api.weather.gov/points/32.7157,-117.1611"
+      },
+      {
+        "area_name": "Ramona",
+        "region": "Inland Valleys",
+        "representative_area": "Ramona",
+        "wind_speed_mph": 10.0,
+        "wind_gust_mph": 17.26168638,
+        "relative_humidity_percent": 45,
+        "temperature_f": 79,
+        "primary_time_period": "2026-06-21T15:00:00-07:00 to 2026-06-22T02:00:00-07:00",
+        "heat_drying_summary": "next 12h temp range 55-79\u00b0F; peak sustained wind 10 mph. Minimum forecast RH about 45% in the next 12h.",
+        "source_link": "https://api.weather.gov/points/33.0417,-116.8681"
+      },
+      {
+        "area_name": "Julian",
+        "region": "Mountains",
+        "representative_area": "Julian",
+        "wind_speed_mph": 15.0,
+        "wind_gust_mph": 24.166360932000003,
+        "relative_humidity_percent": 28,
+        "temperature_f": 76,
+        "primary_time_period": "2026-06-21T15:00:00-07:00 to 2026-06-22T02:00:00-07:00",
+        "heat_drying_summary": "next 12h temp range 54-76\u00b0F; peak sustained wind 15 mph. Minimum forecast RH about 28% in the next 12h.",
+        "source_link": "https://api.weather.gov/points/33.0787,-116.6026"
+      },
+      {
+        "area_name": "Borrego Springs",
+        "region": "Deserts",
+        "representative_area": "Borrego Springs",
+        "wind_speed_mph": 10.0,
+        "wind_gust_mph": 18.412465472,
+        "relative_humidity_percent": 8,
+        "temperature_f": 103,
+        "primary_time_period": "2026-06-21T15:00:00-07:00 to 2026-06-22T02:00:00-07:00",
+        "heat_drying_summary": "next 12h temp range 75-103\u00b0F; peak sustained wind 10 mph. Minimum forecast RH about 8% in the next 12h.",
+        "source_link": "https://api.weather.gov/points/33.2559,-116.3750"
+      }
+    ],
+    "regions": [
+      {
+        "region": "Coastal",
+        "representative_area": "San Diego / Coastal Metro",
+        "peak_sustained_wind_mph": 10.0,
+        "peak_gust_mph": 18.412465472,
+        "minimum_rh_percent": 65,
+        "temperature_f": 71,
+        "primary_time_period": "2026-06-21T15:00:00-07:00 to 2026-06-22T02:00:00-07:00",
+        "heat_drying_summary": "next 12h temp range 63-71\u00b0F; peak sustained wind 10 mph. Minimum forecast RH about 65% in the next 12h.",
+        "source_link": "https://api.weather.gov/points/32.7157,-117.1611"
+      },
+      {
+        "region": "Inland Valleys",
+        "representative_area": "Ramona",
+        "peak_sustained_wind_mph": 10.0,
+        "peak_gust_mph": 17.26168638,
+        "minimum_rh_percent": 45,
+        "temperature_f": 79,
+        "primary_time_period": "2026-06-21T15:00:00-07:00 to 2026-06-22T02:00:00-07:00",
+        "heat_drying_summary": "next 12h temp range 55-79\u00b0F; peak sustained wind 10 mph. Minimum forecast RH about 45% in the next 12h.",
+        "source_link": "https://api.weather.gov/points/33.0417,-116.8681"
+      },
+      {
+        "region": "Mountains",
+        "representative_area": "Julian",
+        "peak_sustained_wind_mph": 15.0,
+        "peak_gust_mph": 24.166360932000003,
+        "minimum_rh_percent": 28,
+        "temperature_f": 76,
+        "primary_time_period": "2026-06-21T15:00:00-07:00 to 2026-06-22T02:00:00-07:00",
+        "heat_drying_summary": "next 12h temp range 54-76\u00b0F; peak sustained wind 15 mph. Minimum forecast RH about 28% in the next 12h.",
+        "source_link": "https://api.weather.gov/points/33.0787,-116.6026"
+      },
+      {
+        "region": "Deserts",
+        "representative_area": "Borrego Springs",
+        "peak_sustained_wind_mph": 10.0,
+        "peak_gust_mph": 18.412465472,
+        "minimum_rh_percent": 8,
+        "temperature_f": 103,
+        "primary_time_period": "2026-06-21T15:00:00-07:00 to 2026-06-22T02:00:00-07:00",
+        "heat_drying_summary": "next 12h temp range 75-103\u00b0F; peak sustained wind 10 mph. Minimum forecast RH about 8% in the next 12h.",
+        "source_link": "https://api.weather.gov/points/33.2559,-116.3750"
+      }
+    ],
+    "most_concerning_region": {
+      "region": "Deserts",
+      "representative_area": "Borrego Springs",
+      "peak_sustained_wind_mph": 10.0,
+      "peak_gust_mph": 18.412465472,
+      "minimum_rh_percent": 8,
+      "primary_time_period": "2026-06-21T15:00:00-07:00 to 2026-06-22T02:00:00-07:00",
+      "concern_score": 50.4,
+      "source_link": "https://api.weather.gov/points/33.2559,-116.3750"
+    },
+    "red_flag_or_watch_status": "None active in NWS San Diego-related alert check",
+    "plain_language_summary": "No active San Diego Red Flag Warning or Fire Weather Watch found in NWS active alerts. Most concerning region: Deserts with peak gust about 18 mph and minimum RH about 8%.",
+    "official_links": [
+      {
+        "label": "NWS San Diego",
+        "url": "https://www.weather.gov/sgx/"
+      },
+      {
+        "label": "NWS Active Alerts",
+        "url": "https://api.weather.gov/alerts/active?area=CA"
+      },
+      {
+        "label": "NWS California Fire Weather",
+        "url": "https://www.weather.gov/wrh/CAFW"
+      },
+      {
+        "label": "NWS SGX Fire Weather Planning Forecast API",
+        "url": "https://api.weather.gov/products/types/FWF/locations/SGX"
+      },
+      {
+        "label": "OSCC Fuels / Fire Danger",
+        "url": "https://gacc.nifc.gov/oscc/fuelsFireDanger.php"
+      }
+    ]
+  },
+  "priority_incidents": [
+    {
+      "incident_id": "e651d75e-b1f2-40d5-b6ab-d14778759284",
+      "name": "Echo Fire",
+      "location": "Proctor Valley Road, Jamul, CA",
+      "county": "San Diego",
+      "latitude": 32.6918754145029,
+      "longitude": -116.901179964359,
+      "acreage": 24.4,
+      "containment": 30.0,
+      "incident_status": "ACTIVE",
+      "status_basis": "CAL FIRE lists the incident as active and containment is below 100%.",
+      "started_at": "2026-06-20T21:34:08Z",
+      "updated_at": "2026-06-21T10:39:55Z",
+      "evacuation_status": "Not reported in CAL FIRE incident record; check County/Genasys/AlertSanDiego for local evacuation details.",
+      "changed_since_previous_update": "Containment changed: 10.0 \u2192 30.0; Newly started incident: Echo Fire",
+      "why_it_matters": "Active local San Diego County incident; may affect prevention messaging, public inquiries, and local situational awareness.",
+      "official_source_link": "https://www.fire.ca.gov/incidents/2026/6/20/echo-fire/",
+      "official_source_links": [
+        {
+          "label": "Official CAL FIRE incident page",
+          "url": "https://www.fire.ca.gov/incidents/2026/6/20/echo-fire/"
+        },
+        {
+          "label": "CAL FIRE Incidents",
+          "url": "https://www.fire.ca.gov/incidents"
+        },
+        {
+          "label": "County Emergency Map",
+          "url": "https://emergencymap.sandiegocounty.gov/index.html"
+        },
+        {
+          "label": "AlertSanDiego",
+          "url": "https://www.alertsandiego.org/"
+        }
+      ],
+      "last_successful_verification_time": "2026-06-21T22:01:06+00:00"
+    },
+    {
+      "incident_id": "a6f944cc-596e-4a26-be88-4f81a68ffa03",
+      "name": "Shore Fire",
+      "location": "San Timoteo Canyon Road, S/W of Calimesa",
+      "county": "Riverside",
+      "latitude": 33.971531,
+      "longitude": -117.114847,
+      "acreage": 3085.0,
+      "containment": 98.0,
+      "incident_status": "ACTIVE",
+      "status_basis": "CAL FIRE lists the incident as active and containment is below 100%.",
+      "started_at": "2026-06-15T15:23:54Z",
+      "updated_at": "2026-06-21T11:11:29Z",
+      "evacuation_status": "Not reported in CAL FIRE incident record; check County/Genasys/AlertSanDiego for local evacuation details.",
+      "changed_since_previous_update": "Containment changed: 95.0 \u2192 98.0; Containment changed: 91.0 \u2192 95.0; Containment changed: 84.0 \u2192 91.0",
+      "why_it_matters": "Adjacent-county incident in Riverside; monitor for regional resource draw, smoke/public messaging, and cross-county prevention relevance.",
+      "official_source_link": "https://www.fire.ca.gov/incidents/2026/6/15/shore-fire/",
+      "official_source_links": [
+        {
+          "label": "Official CAL FIRE incident page",
+          "url": "https://www.fire.ca.gov/incidents/2026/6/15/shore-fire/"
+        },
+        {
+          "label": "CAL FIRE Incidents",
+          "url": "https://www.fire.ca.gov/incidents"
+        },
+        {
+          "label": "County Emergency Map",
+          "url": "https://emergencymap.sandiegocounty.gov/index.html"
+        },
+        {
+          "label": "AlertSanDiego",
+          "url": "https://www.alertsandiego.org/"
+        }
+      ],
+      "last_successful_verification_time": "2026-06-21T22:01:06+00:00"
+    }
+  ],
+  "change_tracking": {
+    "available": true,
+    "since": "2026-06-21T19:00:55+00:00",
+    "items": [
+      {
+        "kind": "weather",
+        "severity": "amber",
+        "text": "Deserts temperature changed from 98\u00b0F to 103\u00b0F.",
+        "source": "NWS"
+      }
+    ],
+    "thresholds": {
+      "windMph": 5,
+      "gustMph": 5,
+      "relativeHumidityPct": 3,
+      "temperatureF": 5,
+      "acreageAcres": 1,
+      "containmentPct": 1
+    }
+  },
+  "source_and_verification_status": {
+    "last_successful_dashboard_update": "2026-06-21T22:01:06+00:00",
+    "last_successful_calfire_check": "2026-06-21T22:01:01+00:00",
+    "last_successful_nws_check": "2026-06-21T22:00:56+00:00",
+    "healthy_sources": 13,
+    "delayed_or_failing_sources": 1,
+    "warning": null,
+    "source_health_summary": {
+      "healthy": 13,
+      "delayed": 0,
+      "stale": 1,
+      "failed": 0,
+      "cached": 1,
+      "oldest_age_minutes": 360
+    },
+    "primary_source_health_summary": {
+      "healthy": 12,
+      "delayed": 0,
+      "stale": 0,
+      "failed": 0,
+      "cached": 0,
+      "oldest_age_minutes": 0
+    },
+    "sources": [
+      {
+        "source_key": "alert_san_diego",
+        "source_name": "AlertSanDiego",
+        "source_url": "https://www.alertsandiego.org/",
+        "source_type": "local",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:01:03+00:00",
+        "last_attempt_at": "2026-06-21T22:01:02+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 1100,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 10,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:01:02+00:00",
+        "last_successful_refresh": "2026-06-21T22:01:03+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:01:03+00:00"
+      },
+      {
+        "source_key": "calfire_active",
+        "source_name": "CAL FIRE active incidents API",
+        "source_url": "https://incidents.fire.ca.gov/umbraco/api/IncidentApi/List?inactive=false",
+        "source_type": "incident",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:01:01+00:00",
+        "last_attempt_at": "2026-06-21T22:01:00+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 773,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 15,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:01:00+00:00",
+        "last_successful_refresh": "2026-06-21T22:01:01+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:01:01+00:00"
+      },
+      {
+        "source_key": "caloes",
+        "source_name": "California Governor's Office of Emergency Services",
+        "source_url": "https://www.caloes.ca.gov/",
+        "source_type": "state",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:01:06+00:00",
+        "last_attempt_at": "2026-06-21T22:01:04+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 2235,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 60,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:01:04+00:00",
+        "last_successful_refresh": "2026-06-21T22:01:06+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:01:06+00:00"
+      },
+      {
+        "source_key": "city_sd_oes",
+        "source_name": "City of San Diego Office of Emergency Services",
+        "source_url": "https://www.sandiego.gov/oes/informed",
+        "source_type": "local",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:01:04+00:00",
+        "last_attempt_at": "2026-06-21T22:01:03+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 890,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 60,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:01:03+00:00",
+        "last_successful_refresh": "2026-06-21T22:01:04+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:01:04+00:00"
+      },
+      {
+        "source_key": "county_emergency_map",
+        "source_name": "County of San Diego OES Emergency Map",
+        "source_url": "https://emergencymap.sandiegocounty.gov/index.html",
+        "source_type": "local",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:01:02+00:00",
+        "last_attempt_at": "2026-06-21T22:01:01+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 532,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 10,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:01:01+00:00",
+        "last_successful_refresh": "2026-06-21T22:01:02+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:01:02+00:00"
+      },
+      {
+        "source_key": "nws_alerts_ca",
+        "source_name": "National Weather Service active California alerts",
+        "source_url": "https://api.weather.gov/alerts/active?area=CA",
+        "source_type": "weather",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:00:56+00:00",
+        "last_attempt_at": "2026-06-21T22:00:56+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 179,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 15,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:00:56+00:00",
+        "last_successful_refresh": "2026-06-21T22:00:56+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:00:56+00:00"
+      },
+      {
+        "source_key": "nws_fwf_sgx",
+        "source_name": "National Weather Service San Diego Fire Weather Planning Forecast",
+        "source_url": "https://api.weather.gov/products/types/FWF/locations/SGX",
+        "source_type": "weather",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:01:00+00:00",
+        "last_attempt_at": "2026-06-21T22:01:00+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 443,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 360,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:01:00+00:00",
+        "last_successful_refresh": "2026-06-21T22:01:00+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:01:00+00:00"
+      },
+      {
+        "source_key": "nws_point_coastal",
+        "source_name": "National Weather Service Coastal San Diego point forecast metadata",
+        "source_url": "https://api.weather.gov/points/32.7157,-117.1611",
+        "source_type": "weather",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:00:56+00:00",
+        "last_attempt_at": "2026-06-21T22:00:56+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 96,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 30,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:00:56+00:00",
+        "last_successful_refresh": "2026-06-21T22:00:56+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:00:56+00:00"
+      },
+      {
+        "source_key": "nws_point_deserts",
+        "source_name": "National Weather Service Deserts/Borrego Springs point forecast metadata",
+        "source_url": "https://api.weather.gov/points/33.2559,-116.3750",
+        "source_type": "weather",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:00:59+00:00",
+        "last_attempt_at": "2026-06-21T22:00:59+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 94,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 30,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:00:59+00:00",
+        "last_successful_refresh": "2026-06-21T22:00:59+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:00:59+00:00"
+      },
+      {
+        "source_key": "nws_point_inland_valleys",
+        "source_name": "National Weather Service Inland Valleys/Ramona point forecast metadata",
+        "source_url": "https://api.weather.gov/points/33.0417,-116.8681",
+        "source_type": "weather",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:00:57+00:00",
+        "last_attempt_at": "2026-06-21T22:00:57+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 81,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 30,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:00:57+00:00",
+        "last_successful_refresh": "2026-06-21T22:00:57+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:00:57+00:00"
+      },
+      {
+        "source_key": "nws_point_mountains",
+        "source_name": "National Weather Service Mountains/Julian point forecast metadata",
+        "source_url": "https://api.weather.gov/points/33.0787,-116.6026",
+        "source_type": "weather",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:00:59+00:00",
+        "last_attempt_at": "2026-06-21T22:00:58+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 1100,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 30,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:00:58+00:00",
+        "last_successful_refresh": "2026-06-21T22:00:59+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:00:59+00:00"
+      },
+      {
+        "source_key": "oscc_fuels_fire_danger",
+        "source_name": "Southern California GACC Fuels and Fire Danger",
+        "source_url": "https://gacc.nifc.gov/oscc/fuelsFireDanger.php",
+        "source_type": "fuels",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:01:00+00:00",
+        "last_attempt_at": "2026-06-21T22:01:00+00:00",
+        "last_error": null,
+        "http_status": 200,
+        "response_ms": 292,
+        "display_status": "Healthy",
+        "expected_frequency_minutes": 720,
+        "age_minutes": 0,
+        "cached": false,
+        "last_attempted_refresh": "2026-06-21T22:01:00+00:00",
+        "last_successful_refresh": "2026-06-21T22:01:00+00:00",
+        "most_recent_error": null,
+        "consecutive_failures": 0,
+        "restore_time": "2026-06-21T22:01:00+00:00"
+      }
+    ]
+  },
+  "collector": {
+    "refreshed_at": "2026-06-21T23:49:10+00:00",
+    "mode": "upstream-json"
+  }
+}
