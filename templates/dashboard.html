@@ -8,88 +8,124 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
   </head>
   <body>
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Operational viewer</p>
+    <header class="command-bar">
+      <div class="command-bar__left">
+        <p class="command-kicker">San Diego wildland operations viewer</p>
         <h1>Wildland Dashboard</h1>
-        <p class="subtle">Updated {{ snapshot.get('last_successful_dashboard_update') or snapshot.get('generated_at') }}</p>
+        <p class="command-subtitle">Command-style situational awareness for fire weather, incidents, prevention messaging, community signals, and source health.</p>
       </div>
-      <form method="post" action="{{ url_for('logout') }}">
-        <button class="ghost" type="submit">Log out</button>
-      </form>
+      <div class="command-bar__right">
+        <div class="stamp">
+          <span class="stamp__label">Last refresh</span>
+          <strong>{{ snapshot.get('last_successful_dashboard_update') or snapshot.get('generated_at') }}</strong>
+        </div>
+        <form method="post" action="{{ url_for('logout') }}">
+          <button class="ghost-button" type="submit">Log out</button>
+        </form>
+      </div>
     </header>
 
     <nav class="section-nav" aria-label="Dashboard sections">
-      <a class="chip-link" href="#overview">Overview</a>
-      <a class="chip-link" href="#incidents">Incidents</a>
-      <a class="chip-link" href="#changes">Changes</a>
-      <a class="chip-link" href="#map-section">Map</a>
-      <a class="chip-link" href="#indicators">Decision indicators</a>
-      <a class="chip-link" href="#context">Additional context</a>
-      <a class="chip-link" href="#sources">Sources</a>
+      <a class="nav-chip" href="#overview">Overview</a>
+      <a class="nav-chip" href="#incidents">Incidents</a>
+      <a class="nav-chip" href="#changes">Changes</a>
+      <a class="nav-chip" href="#map-section">Map</a>
+      <a class="nav-chip" href="#action-plan">Action plan</a>
+      <a class="nav-chip" href="#community-intel">Community intel</a>
+      <a class="nav-chip" href="#review-queue">Stakeholder queue</a>
+      <a class="nav-chip" href="#sources">Sources</a>
     </nav>
 
-    <main class="page">
-      <section id="overview" class="hero card card-hero">
-        <div class="hero-topline">
-          <span class="eyebrow">Verified snapshot</span>
-          <span class="subtle">{{ snapshot.get('generated_at') }}</span>
-        </div>
-        <p class="status-pill {{ (snapshot.executive_summary.severity if snapshot.executive_summary is mapping else 'gray')|lower }}">{{ snapshot.executive_summary.posture if snapshot.executive_summary is mapping else 'Unknown' }}</p>
-        <h2>{{ snapshot.executive_summary.headline if snapshot.executive_summary is mapping else 'Wildland conditions overview' }}</h2>
-        <p>{{ snapshot.executive_summary.text if snapshot.executive_summary is mapping else 'No summary available.' }}</p>
+    {% set lead_incident = (snapshot.priority_incidents[0] if snapshot.priority_incidents else None) %}
+    {% set change_items = snapshot.change_tracking['items'] if snapshot.change_tracking is mapping and 'items' in snapshot.change_tracking else [] %}
+    {% set weather_items = snapshot.san_diego_fire_weather.operational_summary['items'] if snapshot.san_diego_fire_weather is mapping and snapshot.san_diego_fire_weather.operational_summary is mapping and 'items' in snapshot.san_diego_fire_weather.operational_summary else [] %}
+    {% set prevention_items = snapshot.todays_prevention_focus['items'] if snapshot.todays_prevention_focus is mapping and 'items' in snapshot.todays_prevention_focus else [] %}
+    {% set community = snapshot.community_intelligence if snapshot.community_intelligence is mapping else {} %}
+    {% set community_sections = community.sections if community.sections is mapping else {} %}
+    {% set community_summary = community.summary if community.summary is mapping else {} %}
+    {% set high_conf_items = community_sections.high_confidence_community_intelligence['items'] if community_sections.high_confidence_community_intelligence is mapping and 'items' in community_sections.high_confidence_community_intelligence else [] %}
+    {% set stakeholder_items = community_sections.prevention_and_stakeholder_intelligence['items'] if community_sections.prevention_and_stakeholder_intelligence is mapping and 'items' in community_sections.prevention_and_stakeholder_intelligence else [] %}
+    {% set low_conf_items = community_sections.community_signals_low_confidence['items'] if community_sections.community_signals_low_confidence is mapping and 'items' in community_sections.community_signals_low_confidence else [] %}
+    {% set review_queue = community.community_review_queue if community.community_review_queue is mapping else {} %}
+    {% set review_sections = review_queue.sections if review_queue.sections is mapping else {} %}
+    {% set awareness_items = review_sections.autonomous_awareness['items'] if review_sections.autonomous_awareness is mapping and 'items' in review_sections.autonomous_awareness else [] %}
+    {% set review_high = review_sections.high_priority['items'] if review_sections.high_priority is mapping and 'items' in review_sections.high_priority else [] %}
+    {% set review_normal = review_sections.normal_priority['items'] if review_sections.normal_priority is mapping and 'items' in review_sections.normal_priority else [] %}
+    {% set review_low = review_sections.low_priority['items'] if review_sections.low_priority is mapping and 'items' in review_sections.low_priority else [] %}
+    {% set source_health = snapshot.source_and_verification_status.source_health_summary if snapshot.source_and_verification_status is mapping and snapshot.source_and_verification_status.source_health_summary is mapping else {} %}
+    {% set confidence = snapshot.executive_summary.confidence if snapshot.executive_summary is mapping and snapshot.executive_summary.confidence else 'Verified' %}
 
-        {% set lead_incident = (snapshot.priority_incidents[0] if snapshot.priority_incidents else None) %}
-        {% set healthy_sources = snapshot.source_and_verification_status.source_health_summary.healthy if snapshot.source_and_verification_status is mapping and snapshot.source_and_verification_status.source_health_summary is mapping and snapshot.source_and_verification_status.source_health_summary.healthy is not none else snapshot.source_and_verification_status.healthy_sources %}
-        <section class="mini-kpi-grid" aria-label="Catch-up snapshot">
-          <article class="mini-kpi">
-            <span class="mini-label">Nearest fire</span>
-            <strong>{{ lead_incident.name if lead_incident else 'None surfaced' }}</strong>
-            <span class="subtle">{{ lead_incident.location if lead_incident else 'No active incident in snapshot' }}</span>
-          </article>
-          <article class="mini-kpi">
-            <span class="mini-label">Active incidents</span>
-            <strong>{{ snapshot.priority_incidents|length }}</strong>
-            <span class="subtle">currently relevant</span>
-          </article>
-          <article class="mini-kpi">
-            <span class="mini-label">What changed</span>
-            <strong>{{ 'Available' if snapshot.change_tracking.available else 'No material change' }}</strong>
-            <span class="subtle">{{ snapshot.change_tracking.since if snapshot.change_tracking.available else 'Compared with previous successful update' }}</span>
-          </article>
-          <article class="mini-kpi">
-            <span class="mini-label">Source health</span>
-            <strong>{{ healthy_sources if healthy_sources is not none else '—' }} healthy</strong>
-            <span class="subtle">{{ snapshot.source_and_verification_status.delayed_or_failing_sources or 0 }} delayed/failing</span>
-          </article>
-        </section>
+    <main class="page-shell">
+      <section id="overview" class="panel hero-panel">
+        <div class="hero-panel__main">
+          <div class="hero-meta-row">
+            <span class="hero-tag">Verified snapshot</span>
+            <span class="hero-meta">Generated {{ snapshot.get('generated_at') }}</span>
+            <span class="hero-meta">Confidence {{ confidence }}</span>
+          </div>
+          <h2>{{ snapshot.executive_summary.headline if snapshot.executive_summary is mapping else 'Wildland conditions overview' }}</h2>
+          <p class="hero-summary">{{ snapshot.executive_summary.text if snapshot.executive_summary is mapping else 'No summary available.' }}</p>
+          <div class="hero-actions">
+            <a class="action-button" href="#incidents">Active incidents</a>
+            <a class="action-button ghost" href="#map-section">Open live map</a>
+            <a class="action-button ghost" href="#community-intel">Community intel</a>
+          </div>
+        </div>
+        <div class="hero-panel__sidebar">
+          <div class="snapshot-grid">
+            <article class="snapshot-card">
+              <span class="snapshot-label">Posture</span>
+              <strong>{{ snapshot.current_wildland_posture.status }}</strong>
+              <small>{{ snapshot.executive_summary.posture if snapshot.executive_summary is mapping and snapshot.executive_summary.posture else 'Status active' }}</small>
+            </article>
+            <article class="snapshot-card">
+              <span class="snapshot-label">Nearest fire</span>
+              <strong>{{ lead_incident.name if lead_incident else 'None surfaced' }}</strong>
+              <small>{{ lead_incident.location if lead_incident else 'No active incident in snapshot' }}</small>
+            </article>
+            <article class="snapshot-card">
+              <span class="snapshot-label">Active incidents</span>
+              <strong>{{ snapshot.priority_incidents|length }}</strong>
+              <small>currently relevant</small>
+            </article>
+            <article class="snapshot-card">
+              <span class="snapshot-label">Source health</span>
+              <strong>{{ source_health.healthy if source_health.healthy is not none else snapshot.source_and_verification_status.healthy_sources }}</strong>
+              <small>{{ snapshot.source_and_verification_status.delayed_or_failing_sources or 0 }} delayed/failing</small>
+            </article>
+          </div>
+        </div>
       </section>
 
-      <section id="incidents" class="card">
+      <section id="incidents" class="panel">
         <div class="section-head">
-          <h3>Active incidents</h3>
-          <span class="subtle">{{ snapshot.priority_incidents|length }} tracked</span>
+          <div>
+            <p class="section-kicker">Operational priority</p>
+            <h3>Active incidents</h3>
+            <p class="section-copy">The most operationally relevant incident information, condensed for fast scan.</p>
+          </div>
+          <span class="pill neutral">{{ snapshot.priority_incidents|length }} tracked</span>
         </div>
-        <p class="subtle section-copy">The most operationally relevant incident information, condensed for fast scan.</p>
         {% if snapshot.priority_incidents %}
-        <div class="stack incidents">
+        <div class="card-stack">
           {% for incident in snapshot.priority_incidents %}
           <article class="incident-card">
-            <div class="incident-head">
+            <div class="incident-card__top">
               <div>
                 <h4>{{ incident.name }}</h4>
-                <p class="subtle">{{ incident.location }}{% if incident.county %} · {{ incident.county }}{% endif %}</p>
+                <p class="muted-text">{{ incident.location }}{% if incident.county %} · {{ incident.county }}{% endif %}</p>
               </div>
-              <span class="status-pill amber">{{ incident.incident_status }}</span>
+              <span class="pill danger">{{ incident.incident_status }}</span>
             </div>
-            <div class="incident-metrics">
+            <div class="stat-row">
               <span>{{ incident.acreage }} acres</span>
               <span>{{ incident.containment }}% contained</span>
+              {% if incident.updated_at %}<span>{{ incident.updated_at }}</span>{% endif %}
             </div>
             <p>{{ incident.why_it_matters }}</p>
-            {% if incident.evacuation_status %}<p class="subtle"><strong>Evacuation:</strong> {{ incident.evacuation_status }}</p>{% endif %}
+            {% if incident.evacuation_status %}<p class="muted-text"><strong>Evacuation:</strong> {{ incident.evacuation_status }}</p>{% endif %}
             {% if incident.official_source_link %}
-            <p><a href="{{ incident.official_source_link }}" target="_blank" rel="noreferrer">Official source</a></p>
+            <p><a href="{{ incident.official_source_link }}" target="_blank" rel="noreferrer">Official incident source</a></p>
             {% endif %}
           </article>
           {% endfor %}
@@ -99,16 +135,18 @@
         {% endif %}
       </section>
 
-      <section id="changes" class="card">
+      <section id="changes" class="panel">
         <div class="section-head">
-          <h3>What changed since last update</h3>
-          <span class="subtle">Compared with the previous successful dashboard snapshot</span>
+          <div>
+            <p class="section-kicker">Delta review</p>
+            <h3>What changed since last update</h3>
+            <p class="section-copy">Compared with the previous successful dashboard snapshot.</p>
+          </div>
         </div>
-        {% set changes = snapshot.change_tracking['items'] if snapshot.change_tracking is mapping and 'items' in snapshot.change_tracking else [] %}
-        {% if snapshot.change_tracking.available and changes %}
-          <p class="subtle">Change window: {{ snapshot.change_tracking.since }} → {{ snapshot.last_successful_dashboard_update }}</p>
-          <ul class="compact-list">
-            {% for item in changes[:5] %}
+        {% if snapshot.change_tracking.available and change_items %}
+          <p class="muted-text">Change window: {{ snapshot.change_tracking.since }} → {{ snapshot.last_successful_dashboard_update }}</p>
+          <ul class="brief-list">
+            {% for item in change_items[:5] %}
             <li><strong>{{ item.severity|upper if item.severity else 'INFO' }}</strong> — {{ item.text }}</li>
             {% endfor %}
           </ul>
@@ -117,96 +155,240 @@
         {% endif %}
       </section>
 
-      <section id="map-section" class="card">
+      <section id="map-section" class="panel">
         <div class="section-head">
-          <h3>Map</h3>
-          <span class="subtle">Tap markers for incident details</span>
+          <div>
+            <p class="section-kicker">Spatial view</p>
+            <h3>Incident map</h3>
+            <p class="section-copy">Incidents and available overlays. Use the incident cards above for the fastest mobile scan.</p>
+          </div>
+          <span class="pill neutral">Live markers</span>
         </div>
-        <p class="subtle section-copy">Incidents and available overlays. Use the incident cards above for the fastest mobile scan.</p>
         <div id="incident-map" class="map"></div>
       </section>
 
-      <section id="indicators" class="card">
+      <section class="panel">
         <div class="section-head">
-          <h3>Decision indicators</h3>
-          <span class="subtle">The key signals driving today’s dashboard status</span>
+          <div>
+            <p class="section-kicker">Drivers</p>
+            <h3>Decision indicators</h3>
+            <p class="section-copy">The key signals driving the current dashboard status.</p>
+          </div>
         </div>
         <div class="indicator-grid">
-          <article class="mini-card">
-            <p class="mini-label">Overall posture</p>
-            <p class="metric">{{ snapshot.current_wildland_posture.status }}</p>
+          <article class="indicator-card">
+            <span class="snapshot-label">Overall posture</span>
+            <strong>{{ snapshot.current_wildland_posture.status }}</strong>
             <p>{{ snapshot.current_wildland_posture.explanation }}</p>
           </article>
-          <article class="mini-card">
-            <p class="mini-label">Fire weather risk</p>
-            <p class="metric">{{ snapshot.executive_summary.risk_level if snapshot.executive_summary is mapping and snapshot.executive_summary.risk_level else snapshot.san_diego_fire_weather.red_flag_or_watch_status }}</p>
+          <article class="indicator-card">
+            <span class="snapshot-label">Fire weather risk</span>
+            <strong>{{ snapshot.executive_summary.risk_level if snapshot.executive_summary is mapping and snapshot.executive_summary.risk_level else snapshot.san_diego_fire_weather.red_flag_or_watch_status }}</strong>
             <p>{{ snapshot.san_diego_fire_weather.plain_language_summary }}</p>
           </article>
-          <article class="mini-card">
-            <p class="mini-label">Nearest fire to San Diego</p>
-            <p class="metric">{{ lead_incident.name if lead_incident else 'None surfaced' }}</p>
+          <article class="indicator-card">
+            <span class="snapshot-label">Nearest fire</span>
+            <strong>{{ lead_incident.name if lead_incident else 'None surfaced' }}</strong>
             <p>{{ lead_incident.location if lead_incident else 'No active incident currently meets configured thresholds.' }}</p>
           </article>
-          <article class="mini-card">
-            <p class="mini-label">Source confidence</p>
-            <p class="metric">{{ snapshot.executive_summary.confidence if snapshot.executive_summary is mapping and snapshot.executive_summary.confidence else 'Verified' }}</p>
-            <p>{{ healthy_sources if healthy_sources is not none else '—' }} healthy source(s) in the current snapshot.</p>
+          <article class="indicator-card">
+            <span class="snapshot-label">Source confidence</span>
+            <strong>{{ confidence }}</strong>
+            <p>{{ source_health.healthy if source_health.healthy is not none else snapshot.source_and_verification_status.healthy_sources }} healthy source(s) in the current snapshot.</p>
           </article>
         </div>
       </section>
 
-      <section id="context" class="card">
+      <section id="action-plan" class="panel">
         <div class="section-head">
-          <h3>Additional context</h3>
-          <span class="subtle">Weather and deeper snapshot detail</span>
-        </div>
-
-        <details open class="context-block">
-          <summary>Operational fire weather</summary>
-          <div class="details-body">
-            <p class="subtle">{{ snapshot.san_diego_fire_weather.red_flag_or_watch_status }}</p>
-            <p>{{ snapshot.san_diego_fire_weather.plain_language_summary }}</p>
-            {% set weather_items = snapshot.san_diego_fire_weather.operational_summary['items'] if snapshot.san_diego_fire_weather is mapping and snapshot.san_diego_fire_weather.operational_summary is mapping and 'items' in snapshot.san_diego_fire_weather.operational_summary else [] %}
-            <div class="stack weather-items">
-              {% for item in weather_items[:6] %}
-              <div class="mini-card">
-                <p class="mini-label">{{ item.label }}</p>
-                <p>{{ item.value }}</p>
-              </div>
-              {% endfor %}
-            </div>
+          <div>
+            <p class="section-kicker">Field messaging</p>
+            <h3>Action plan</h3>
+            <p class="section-copy">Prevention considerations framed for operational messaging and awareness support.</p>
           </div>
-        </details>
+        </div>
+        {% if prevention_items %}
+        <div class="card-stack three-up">
+          {% for item in prevention_items[:4] %}
+          <article class="brief-card">
+            <span class="pill warning">{{ item.priority or 'Monitor' }}</span>
+            <h4>{{ item.title }}</h4>
+            <p><strong>Primary action:</strong> {{ item.suggested_use or item.body }}</p>
+            <p><strong>Why this matters:</strong> {{ item.trigger or item.operational_relevance }}</p>
+            <p class="muted-text"><strong>Where:</strong> {{ item.affected_geography or 'San Diego region' }}</p>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No action-plan items are included in the current snapshot.</p>
+        {% endif %}
       </section>
 
-      <section id="sources" class="card">
+      <section class="panel context-panel">
         <div class="section-head">
-          <h3>Source health</h3>
-          <span class="subtle">How reliable the current data is</span>
+          <div>
+            <p class="section-kicker">Weather context</p>
+            <h3>Operational fire weather factors</h3>
+            <p class="section-copy">Condensed weather drivers that support the current posture.</p>
+          </div>
+          <span class="pill neutral">{{ snapshot.san_diego_fire_weather.red_flag_or_watch_status }}</span>
+        </div>
+        <p>{{ snapshot.san_diego_fire_weather.plain_language_summary }}</p>
+        <div class="context-grid">
+          {% for item in weather_items[:6] %}
+          <article class="detail-card">
+            <span class="snapshot-label">{{ item.label }}</span>
+            <strong>{{ item.value }}</strong>
+          </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section id="community-intel" class="panel intel-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Awareness signals</p>
+            <h3>Community intelligence</h3>
+            <p class="section-copy">Community/social reporting is used as an awareness signal, not confirmed truth. Confirm with official sources before operational use.</p>
+          </div>
+          <span class="pill warning">{{ community_summary.open_findings if community_summary.open_findings is not none else 0 }} open</span>
+        </div>
+
+        <div class="indicator-grid">
+          <article class="indicator-card compact">
+            <span class="snapshot-label">Corroborated</span>
+            <strong>{{ community_summary.officially_corroborated if community_summary.officially_corroborated is not none else 0 }}</strong>
+          </article>
+          <article class="indicator-card compact">
+            <span class="snapshot-label">High confidence</span>
+            <strong>{{ community_summary.high_confidence if community_summary.high_confidence is not none else 0 }}</strong>
+          </article>
+          <article class="indicator-card compact">
+            <span class="snapshot-label">Medium confidence</span>
+            <strong>{{ community_summary.medium_confidence if community_summary.medium_confidence is not none else 0 }}</strong>
+          </article>
+          <article class="indicator-card compact">
+            <span class="snapshot-label">Suppressed</span>
+            <strong>{{ community_summary.suppressed_findings if community_summary.suppressed_findings is not none else 0 }}</strong>
+          </article>
+        </div>
+
+        {% if high_conf_items or stakeholder_items or low_conf_items %}
+        <div class="card-stack">
+          {% for item in high_conf_items[:3] %}
+          <article class="intel-card high">
+            <span class="pill success">High confidence</span>
+            <h4>{{ item.headline }}</h4>
+            <p>{{ item.summary }}</p>
+            <p class="muted-text">Status: {{ item.finding_status or 'Open' }} · Sources: {{ item.supporting_signal_count or 0 }}</p>
+          </article>
+          {% endfor %}
+          {% for item in stakeholder_items[:4] %}
+          <article class="intel-card medium">
+            <span class="pill warning">{{ item.confidence_label or 'Medium' }}</span>
+            <h4>{{ item.headline }}</h4>
+            <p>{{ item.summary }}</p>
+            {% if item.prevention_relevance %}<p><strong>Operational relevance:</strong> {{ item.prevention_relevance }}</p>{% endif %}
+            <p class="muted-text">Status: {{ item.finding_status or 'Open' }} · Sources: {{ item.supporting_signal_count or 0 }}</p>
+          </article>
+          {% endfor %}
+          {% for item in low_conf_items[:2] %}
+          <article class="intel-card low">
+            <span class="pill neutral">Low confidence</span>
+            <h4>{{ item.headline }}</h4>
+            <p>{{ item.summary }}</p>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No community-intelligence items are present in the current snapshot.</p>
+        {% endif %}
+      </section>
+
+      <section id="review-queue" class="panel review-panel">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Review-required</p>
+            <h3>Stakeholder queue</h3>
+            <p class="section-copy">Review-required stakeholder/public-page items are shown for operator awareness only.</p>
+          </div>
+          <span class="pill neutral">{{ (review_queue.summary.pending_items if review_queue.summary is mapping and review_queue.summary.pending_items is not none else 0) }} pending</span>
+        </div>
+        {% if awareness_items or review_high or review_normal or review_low %}
+        <div class="card-stack">
+          {% for item in awareness_items[:2] %}
+          <article class="brief-card accent-blue">
+            <span class="pill neutral">Autonomous awareness</span>
+            <h4>{{ item.headline or item.title }}</h4>
+            <p>{{ item.summary or item.body }}</p>
+          </article>
+          {% endfor %}
+          {% for item in review_high[:3] %}
+          <article class="brief-card accent-red">
+            <span class="pill danger">High priority</span>
+            <h4>{{ item.headline or item.title }}</h4>
+            <p>{{ item.summary or item.body }}</p>
+          </article>
+          {% endfor %}
+          {% for item in review_normal[:4] %}
+          <article class="brief-card accent-gold">
+            <span class="pill warning">Normal review</span>
+            <h4>{{ item.headline or item.title }}</h4>
+            <p>{{ item.summary or item.body }}</p>
+          </article>
+          {% endfor %}
+          {% for item in review_low[:2] %}
+          <article class="brief-card">
+            <span class="pill neutral">Low review</span>
+            <h4>{{ item.headline or item.title }}</h4>
+            <p>{{ item.summary or item.body }}</p>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p>No stakeholder review items are present in the current snapshot.</p>
+        {% endif %}
+      </section>
+
+      <section id="sources" class="panel">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">Trust boundary</p>
+            <h3>Source health</h3>
+            <p class="section-copy">How reliable the current data is and when the major feeds last refreshed.</p>
+          </div>
+          <span class="pill neutral">{{ source_health.healthy if source_health.healthy is not none else snapshot.source_and_verification_status.healthy_sources }} healthy</span>
         </div>
         {% if snapshot.source_and_verification_status.warning %}
-        <div class="alert soft">{{ snapshot.source_and_verification_status.warning }}</div>
+        <div class="notice warning-notice">{{ snapshot.source_and_verification_status.warning }}</div>
         {% endif %}
-        <ul class="compact-list">
+        <div class="context-grid source-summary-grid">
+          <article class="detail-card"><span class="snapshot-label">Healthy</span><strong>{{ source_health.healthy if source_health.healthy is not none else snapshot.source_and_verification_status.healthy_sources }}</strong></article>
+          <article class="detail-card"><span class="snapshot-label">Delayed</span><strong>{{ source_health.delayed if source_health.delayed is not none else 0 }}</strong></article>
+          <article class="detail-card"><span class="snapshot-label">Stale</span><strong>{{ source_health.stale if source_health.stale is not none else 0 }}</strong></article>
+          <article class="detail-card"><span class="snapshot-label">Failed</span><strong>{{ source_health.failed if source_health.failed is not none else 0 }}</strong></article>
+        </div>
+        <ul class="brief-list small-gap">
           <li>Dashboard update: {{ snapshot.source_and_verification_status.last_successful_dashboard_update }}</li>
           <li>CAL FIRE check: {{ snapshot.source_and_verification_status.last_successful_calfire_check or 'n/a' }}</li>
           <li>NWS check: {{ snapshot.source_and_verification_status.last_successful_nws_check or 'n/a' }}</li>
         </ul>
         {% if snapshot.source_and_verification_status.sources %}
-        <details class="context-block">
+        <details class="diagnostics">
           <summary>View source diagnostics</summary>
-          <div class="details-body stack">
+          <div class="card-stack diagnostics-stack">
             {% for source in snapshot.source_and_verification_status.sources %}
-            <article class="mini-card">
-              <p class="mini-label">{{ source.source_name }}</p>
-              <p>{{ source.display_status or source.status }}</p>
-              <p class="subtle">Age: {{ source.age_minutes if source.age_minutes is not none else 'Unknown' }} min · Expected {{ source.expected_frequency_minutes or '—' }} min</p>
+            <article class="detail-card">
+              <span class="snapshot-label">{{ source.source_name }}</span>
+              <strong>{{ source.display_status or source.status }}</strong>
+              <p class="muted-text">Age: {{ source.age_minutes if source.age_minutes is not none else 'Unknown' }} min · Expected {{ source.expected_frequency_minutes or '—' }} min</p>
               {% if source.source_url %}<p><a href="{{ source.source_url }}" target="_blank" rel="noreferrer">Source link</a></p>{% endif %}
             </article>
             {% endfor %}
           </div>
         </details>
         {% endif %}
+        <p class="disclaimer-text">{{ snapshot.security_note }}</p>
       </section>
     </main>
 

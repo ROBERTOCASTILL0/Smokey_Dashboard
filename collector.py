@@ -23,8 +23,12 @@ KEEP_KEYS = [
     'current_wildland_posture',
     'san_diego_fire_weather',
     'priority_incidents',
+    'todays_prevention_focus',
+    'dashboard_config',
     'change_tracking',
     'source_and_verification_status',
+    'community_intelligence',
+    'security_note',
 ]
 
 
@@ -71,6 +75,17 @@ def sample_payload() -> dict:
             'official_links': [],
         },
         'priority_incidents': [],
+        'todays_prevention_focus': {
+            'label': 'Suggested prevention considerations — not incident commands or official directives',
+            'items': [],
+        },
+        'dashboard_config': {
+            'description': 'Dashboard thresholds and map defaults for the public viewer.',
+            'watchAreas': [],
+            'defaultMapCenter': [32.95, -116.85],
+            'defaultMapZoom': 8,
+            'defaultMapBounds': [[32.45, -117.55], [33.55, -116.05]],
+        },
         'change_tracking': {
             'available': False,
             'since': None,
@@ -86,7 +101,47 @@ def sample_payload() -> dict:
             'primary_source_health_summary': {'healthy': 0, 'delayed': 0, 'stale': 0, 'failed': 0, 'cached': 0, 'oldest_age_minutes': None},
             'sources': [],
         },
+        'community_intelligence': {
+            'enabled': False,
+            'generated_at': now,
+            'disclaimer': 'Community/social reporting is used as an awareness signal, not confirmed truth. Confirm with official sources before operational use.',
+            'summary': {},
+            'sections': {
+                'high_confidence_community_intelligence': {'label': 'High Confidence Community Intelligence', 'cap': 5, 'items': []},
+                'prevention_and_stakeholder_intelligence': {'label': 'Prevention & Stakeholder Intelligence', 'cap': 10, 'items': []},
+                'community_signals_low_confidence': {'label': 'Low Confidence Community Signals', 'cap': 10, 'items': []},
+            },
+            'community_review_queue': {
+                'enabled': False,
+                'generated_at': now,
+                'disclaimer': 'Review-required stakeholder/public-page items are shown for operator awareness only.',
+                'summary': {},
+                'sections': {
+                    'autonomous_awareness': {'label': 'Autonomous Awareness: Review-Required Items', 'cap': 3, 'items': []},
+                    'high_priority': {'label': 'Review Queue: High Priority', 'cap': 5, 'items': []},
+                    'normal_priority': {'label': 'Review Queue: Normal', 'cap': 10, 'items': []},
+                    'low_priority': {'label': 'Review Queue: Low Priority', 'cap': 10, 'items': []},
+                },
+            },
+        },
+        'security_note': 'Public-safe read-only viewer. Dashboard conclusions are not official agency statements.',
     }
+
+
+def scrub_private_values(value):
+    if isinstance(value, dict):
+        cleaned = {}
+        for key, item in value.items():
+            key_text = str(key).lower()
+            if any(token in key_text for token in ('path', 'inputpath', 'summarypath', 'candidatepath', 'rejectionpath')):
+                continue
+            cleaned[key] = scrub_private_values(item)
+        return cleaned
+    if isinstance(value, list):
+        return [scrub_private_values(item) for item in value]
+    if isinstance(value, str) and ('/opt/data' in value or value.startswith('file://')):
+        return ''
+    return value
 
 
 def normalize_payload(raw: dict) -> dict:
@@ -99,6 +154,12 @@ def normalize_payload(raw: dict) -> dict:
         payload['priority_incidents'] = []
     if not isinstance(payload.get('change_tracking'), dict):
         payload['change_tracking'] = deepcopy(baseline['change_tracking'])
+    if not isinstance(payload.get('todays_prevention_focus'), dict):
+        payload['todays_prevention_focus'] = deepcopy(baseline['todays_prevention_focus'])
+    if not isinstance(payload.get('dashboard_config'), dict):
+        payload['dashboard_config'] = deepcopy(baseline['dashboard_config'])
+    if not isinstance(payload.get('community_intelligence'), dict):
+        payload['community_intelligence'] = deepcopy(baseline['community_intelligence'])
     if not isinstance(payload.get('source_and_verification_status'), dict):
         payload['source_and_verification_status'] = deepcopy(baseline['source_and_verification_status'])
     source_status = payload.get('source_and_verification_status')
@@ -109,10 +170,12 @@ def normalize_payload(raw: dict) -> dict:
     source_status['sources'] = [
         item for item in source_items
         if isinstance(item, dict)
-        and item.get('source_type') != 'community'
         and '/opt/data' not in str(item.get('source_url') or '')
         and not str(item.get('source_url') or '').startswith('file://')
     ]
+    payload['dashboard_config'] = scrub_private_values(payload.get('dashboard_config') or {})
+    payload['community_intelligence'] = scrub_private_values(payload.get('community_intelligence') or {})
+    payload['security_note'] = baseline['security_note']
     return payload
 
 

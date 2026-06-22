@@ -332,6 +332,168 @@
       "last_successful_verification_time": "2026-06-21T22:01:06+00:00"
     }
   ],
+  "todays_prevention_focus": {
+    "label": "Suggested prevention considerations \u2014 not incident commands or official directives",
+    "items": [
+      {
+        "title": "Cured grass and fine fuels",
+        "body": "Minimum forecast RH near 8% supports fine-fuel ignition awareness, especially in grass-dominated WUI edges and vacant parcels.",
+        "priority": "High",
+        "trigger": "Minimum forecast RH near 8% supports fine-fuel ignition awareness, especially in grass-dominated WUI edges and vacant parcels",
+        "affected_geography": "Deserts",
+        "operational_relevance": "Prevention messaging and situational-awareness support; not an incident command or official directive.",
+        "suggested_use": "Minimum forecast RH near 8% supports fine-fuel ignition awareness, especially in grass-dominated WUI edges and vacant parcels.",
+        "source": "NWS/CAL FIRE/dashboard rules",
+        "generated_at": "2026-06-21T22:01:06+00:00"
+      },
+      {
+        "title": "Local incident awareness",
+        "body": "A San Diego County CAL FIRE incident is listed; consider aligning prevention messaging with current public concern, evacuation-route awareness, and defensible-space reminders.",
+        "priority": "Elevated",
+        "trigger": "A San Diego County CAL FIRE incident is listed; consider aligning prevention messaging with current public concern, evacuation-route awareness, and defensible-space reminders",
+        "affected_geography": "Deserts",
+        "operational_relevance": "Prevention messaging and situational-awareness support; not an incident command or official directive.",
+        "suggested_use": "A San Diego County CAL FIRE incident is listed; consider aligning prevention messaging with current public concern, evacuation-route awareness, and defensible-space reminders.",
+        "source": "NWS/CAL FIRE/dashboard rules",
+        "generated_at": "2026-06-21T22:01:06+00:00"
+      },
+      {
+        "title": "Defensible space and home hardening",
+        "body": "Continue concise reminders on defensible space, ember-resistant maintenance, and removal of receptive fuels near structures; label as prevention considerations, not directives.",
+        "priority": "Elevated",
+        "trigger": "Continue concise reminders on defensible space, ember-resistant maintenance, and removal of receptive fuels near structures; label as prevention considerations, not directives",
+        "affected_geography": "Deserts",
+        "operational_relevance": "Prevention messaging and situational-awareness support; not an incident command or official directive.",
+        "suggested_use": "Continue concise reminders on defensible space, ember-resistant maintenance, and removal of receptive fuels near structures; label as prevention considerations, not directives.",
+        "source": "NWS/CAL FIRE/dashboard rules",
+        "generated_at": "2026-06-21T22:01:06+00:00"
+      }
+    ]
+  },
+  "dashboard_config": {
+    "description": "Centralized Wildland Fire Prevention Dashboard thresholds. These are dashboard-classification thresholds, not official agency trigger points.",
+    "nearbyIncidentMiles": 25,
+    "significantIncidentMiles": 50,
+    "significantAcreage": 100,
+    "rapidGrowthAcres": 1,
+    "lowRhThreshold": 25,
+    "criticalRhThreshold": 10,
+    "highRhThreshold": 15,
+    "elevatedGustThreshold": 30,
+    "highGustThreshold": 40,
+    "criticalGustThreshold": 50,
+    "sourceStaleMinutes": 60,
+    "sourceFailedMinutes": 180,
+    "changeThresholds": {
+      "windMph": 5,
+      "gustMph": 5,
+      "relativeHumidityPct": 3,
+      "temperatureF": 5,
+      "acreageAcres": 1,
+      "containmentPct": 1
+    },
+    "watchAreas": [
+      {
+        "name": "City of San Diego",
+        "center": [
+          32.7157,
+          -117.1611
+        ],
+        "radiusMiles": 20
+      },
+      {
+        "name": "San Diego County",
+        "center": [
+          33.0,
+          -116.85
+        ],
+        "radiusMiles": 70
+      },
+      {
+        "name": "East County",
+        "center": [
+          32.82,
+          -116.75
+        ],
+        "radiusMiles": 35
+      },
+      {
+        "name": "Ramona",
+        "center": [
+          33.0417,
+          -116.8681
+        ],
+        "radiusMiles": 15
+      },
+      {
+        "name": "Julian",
+        "center": [
+          33.0787,
+          -116.6026
+        ],
+        "radiusMiles": 15
+      },
+      {
+        "name": "Borrego Springs",
+        "center": [
+          33.2559,
+          -116.375
+        ],
+        "radiusMiles": 18
+      },
+      {
+        "name": "Mountain communities",
+        "center": [
+          32.9,
+          -116.55
+        ],
+        "radiusMiles": 35
+      },
+      {
+        "name": "Desert communities",
+        "center": [
+          33.15,
+          -116.25
+        ],
+        "radiusMiles": 45
+      }
+    ],
+    "defaultMapCenter": [
+      32.95,
+      -116.85
+    ],
+    "defaultMapZoom": 8,
+    "defaultMapBounds": [
+      [
+        32.45,
+        -117.55
+      ],
+      [
+        33.55,
+        -116.05
+      ]
+    ],
+    "communityIntelligence": {
+      "enabled": true,
+      "enablePublicCollectors": true,
+      "publicCollectorMaxAgeHours": 24,
+      "publicCollectorMaxItemsPerSource": 25,
+      "priorityCap": 5,
+      "stakeholderCap": 10,
+      "lowConfidenceCap": 10,
+      "reviewQueueAutoSurfaceEnabled": true,
+      "reviewQueueAutoSurfaceMaxAgeHours": 18,
+      "reviewQueueAutoSurfaceCap": 3,
+      "reviewQueueAutoSurfacePerCategoryCap": 1,
+      "reviewQueueAutoSurfacePerSourceCap": 1,
+      "reviewQueueAutoSurfaceMinScore": 60,
+      "groupingWindowMinutes": 180,
+      "staleAfterHours": 24,
+      "watchAfterHours": 12,
+      "minIndependentSourcesForMedium": 2,
+      "minIndependentSourcesForHigh": 3
+    }
+  },
   "change_tracking": {
     "available": true,
     "since": "2026-06-21T19:00:55+00:00",
@@ -630,8 +792,165 @@
       }
     ]
   },
+  "community_intelligence": {
+    "enabled": true,
+    "mode": "combined_inputs_file",
+    "generated_at": "2026-06-21T22:01:06+00:00",
+    "disclaimer": "Community/social reporting is used as an awareness signal, not confirmed truth. Confirm with official sources before operational use.",
+    "summary": {
+      "open_findings": 1,
+      "high_confidence": 0,
+      "medium_confidence": 1,
+      "low_confidence": 0,
+      "watch_confidence": 0,
+      "officially_corroborated": 1,
+      "reviewed_signals": 0,
+      "auto_collected_signals": 3,
+      "accepted_signals": 3,
+      "suppressed_findings": 0
+    },
+    "sections": {
+      "high_confidence_community_intelligence": {
+        "label": "High Confidence Community Intelligence",
+        "cap": 5,
+        "items": []
+      },
+      "prevention_and_stakeholder_intelligence": {
+        "label": "Prevention & Stakeholder Intelligence",
+        "cap": 10,
+        "items": [
+          {
+            "finding_id": "f2f33609e6e350e4df43b70a0047a8ec7222a066981d6ae49137886ad683a318",
+            "headline": "Jamul: stakeholder/prevention signal worth tracking",
+            "summary": "Observed across 3 accepted public-source item(s): Cal Fire San Diego crews respond to vegetation fire burning in Jamul - NBC 7 San Diego \u2014 Cal Fire San Diego crews respond to vegetation fire burning in Jamul NBC 7 San Diego; Brush fire burns in Jamul area of southwest San Diego County - 10News.com \u2014 Brush fire burns in Jamul area of southwest San Diego County 10News.com. Official incident context present: Echo Fire.",
+            "confidence_label": "MEDIUM",
+            "action_recommendation": "Engage",
+            "finding_status": "CORROBORATED",
+            "area_label": "Jamul",
+            "primary_category": "vegetation_fire",
+            "supporting_signal_count": 3,
+            "independent_source_count": 2,
+            "official_corroboration": true,
+            "official_reference": "Official incident context present: Echo Fire.",
+            "prevention_relevance": "Useful as an early awareness signal; monitor for corroboration before operational use.",
+            "platforms": [
+              "google_news"
+            ],
+            "last_seen_at": "2026-06-21T06:08:00+00:00"
+          }
+        ]
+      },
+      "community_signals_low_confidence": {
+        "label": "Low Confidence Community Signals",
+        "cap": 10,
+        "items": []
+      }
+    },
+    "source_status": {
+      "source_key": "community_combined_inputs",
+      "status": "HEALTHY",
+      "last_success_at": "2026-06-21T22:01:06+00:00",
+      "warning": null
+    },
+    "community_review_queue": {
+      "enabled": true,
+      "generated_at": "2026-06-21T22:01:06+00:00",
+      "disclaimer": "Review-required stakeholder/public-page items are shown for operator awareness only. Auto-surfaced items do not affect posture, incidents, accepted community findings, or operational recommendations.",
+      "summary": {
+        "pending_items": 2,
+        "auto_surfaced_items": 0,
+        "high_priority": 0,
+        "normal_priority": 2,
+        "low_priority": 0
+      },
+      "sections": {
+        "autonomous_awareness": {
+          "label": "Autonomous Awareness: Review-Required Items",
+          "cap": 3,
+          "items": []
+        },
+        "high_priority": {
+          "label": "Review Queue: High Priority",
+          "cap": 5,
+          "items": []
+        },
+        "normal_priority": {
+          "label": "Review Queue: Normal",
+          "cap": 10,
+          "items": [
+            {
+              "review_dedup_key": "firesafe_sdcounty_events|https://firesafesdcounty.org/event/vista-wildfire-safety-fair/|valley center wildfire safety fair \u2014 as peak wildfire season approaches, preparation can play an important role in community safety. sdg&e\u00ae is hosting a series of no\u2011cost wildfire safety fairs open to the public to share emergency preparedness resources and information. these events offer practical information on steps people can take to prepare for wildfire and other emergencies, including how to build an emergency supply kit, create an emergency plan and make adjustments around a home that may help reduce wildfire exposure. information will be available from sdg&e and regional emergency preparedness partners. learn more here: https://www.sdge.com/summer-wildfire-safety-fairs date: saturday, august 29th, 2026 location: bates nut farm, 15954 woods valley rd, valley center, ca 92082 when: 9:00am-1:00pm|2026-08-29T09:00:00+00:00",
+              "headline": "Valley Center Wildfire Safety Fair \u2014 As peak wildfire season approaches, preparation can play an important role in community safety. SDG&E\u00ae is hosting a series of no\u2011cost Wildfire Safety Fairs open to the public to share emergency preparedness resources and information. These events offer practical information on steps people can take to prepare for wildfire and other emergencies, including how to build an emergency supply kit, create an emergency plan and make adjustments around a home that may help reduce wildfire exposure. Information will be available from SDG&E and regional emergency preparedness partners. Learn more here: https://www.sdge.com/summer-wildfire-safety-fairs Date: Saturday, August 29th, 2026 Location: Bates Nut Farm, 15954 Woods Valley Rd, Valley Center, CA 92082 When: 9:00am-1:00pm",
+              "source_name": "Fire Safe Council",
+              "publisher": "Fire Safe Council",
+              "stakeholder_category": "fire_safe_council",
+              "area_label": "Valley Center",
+              "matched_keywords": [
+                "fire safe",
+                "preparedness",
+                "wildfire"
+              ],
+              "signal_category": "mitigation_opportunity",
+              "collection_method": "direct_json_api",
+              "published_at": "2026-08-29T09:00:00+00:00",
+              "url": "https://firesafesdcounty.org/event/vista-wildfire-safety-fair/",
+              "review_queue_reason": "publisher_review_required",
+              "review_queue_status": "pending",
+              "review_priority": "normal",
+              "auto_surface": false,
+              "auto_surface_score": 0,
+              "auto_surface_reasons": [
+                "future_dated"
+              ],
+              "awareness_lane_status": "pending",
+              "badge": "NOT YET APPROVED"
+            },
+            {
+              "review_dedup_key": "firesafe_sdcounty_events|https://firesafesdcounty.org/event/alpine-wildfire-safety-fair-3/|alpine wildfire safety fair \u2014 as peak wildfire season approaches, preparation can play an important role in community safety. sdg&e\u00ae is hosting a series of no\u2011cost wildfire safety fairs open to the public to share emergency preparedness resources and information. these events offer practical information on steps people can take to prepare for wildfire and other emergencies, including how to build an emergency supply kit, create an emergency plan and make adjustments around a home that may help reduce wildfire exposure. information will be available from sdg&e and regional emergency preparedness partners. learn more here: https://www.sdge.com/summer-wildfire-safety-fairs date: saturday, june 27th, 2026 location: joan macqueen middle school, 2001 tavern rd, alpine, 91901 when: 9:00am-1:00pm|2026-06-27T09:00:00+00:00",
+              "headline": "Alpine Wildfire Safety Fair \u2014 As peak wildfire season approaches, preparation can play an important role in community safety. SDG&E\u00ae is hosting a series of no\u2011cost Wildfire Safety Fairs open to the public to share emergency preparedness resources and information. These events offer practical information on steps people can take to prepare for wildfire and other emergencies, including how to build an emergency supply kit, create an emergency plan and make adjustments around a home that may help reduce wildfire exposure. Information will be available from SDG&E and regional emergency preparedness partners. Learn more here: https://www.sdge.com/summer-wildfire-safety-fairs Date: Saturday, June 27th, 2026 Location: Joan MacQueen Middle School, 2001 Tavern Rd, Alpine, 91901 When: 9:00am-1:00pm",
+              "source_name": "Fire Safe Council",
+              "publisher": "Fire Safe Council",
+              "stakeholder_category": "fire_safe_council",
+              "area_label": "Alpine",
+              "matched_keywords": [
+                "fire safe",
+                "preparedness",
+                "wildfire"
+              ],
+              "signal_category": "mitigation_opportunity",
+              "collection_method": "direct_json_api",
+              "published_at": "2026-06-27T09:00:00+00:00",
+              "url": "https://firesafesdcounty.org/event/alpine-wildfire-safety-fair-3/",
+              "review_queue_reason": "publisher_review_required",
+              "review_queue_status": "pending",
+              "review_priority": "normal",
+              "auto_surface": false,
+              "auto_surface_score": 0,
+              "auto_surface_reasons": [
+                "future_dated"
+              ],
+              "awareness_lane_status": "pending",
+              "badge": "NOT YET APPROVED"
+            }
+          ]
+        },
+        "low_priority": {
+          "label": "Review Queue: Low",
+          "cap": 10,
+          "items": []
+        }
+      },
+      "source_status": {
+        "source_key": "public_source_review_queue",
+        "status": "HEALTHY",
+        "last_success_at": "2026-06-21T22:01:06+00:00",
+        "warning": null
+      }
+    }
+  },
+  "security_note": "Public-safe read-only viewer. Dashboard conclusions are not official agency statements.",
   "collector": {
-    "refreshed_at": "2026-06-21T23:49:10+00:00",
+    "refreshed_at": "2026-06-22T00:22:53+00:00",
     "mode": "upstream-json"
   }
 }
