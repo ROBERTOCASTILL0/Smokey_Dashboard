@@ -218,9 +218,8 @@ button { font-family: inherit; cursor: pointer; }
 .command-nav {
   border-bottom: 1px solid var(--border);
   background: var(--bg);
-  position: sticky;
-  top: 0;
-  z-index: 30;
+  position: relative;
+  z-index: 1;
 }
 .command-nav__inner {
   display: flex;
