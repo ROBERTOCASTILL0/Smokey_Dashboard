@@ -107,6 +107,8 @@ def validate_push_payload(payload: dict) -> str | None:
         'san_diego_fire_weather': dict,
         'current_wildland_posture': dict,
         'todays_prevention_focus': dict,
+        'grants_watch': dict,
+        'relevant_news': dict,
         'executive_summary': dict,
     }
     for field, expected_type in typed_fields.items():

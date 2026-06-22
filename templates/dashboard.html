@@ -18,6 +18,8 @@
 
   {% set wf = snapshot.san_diego_fire_weather if snapshot.san_diego_fire_weather is mapping else {} %}
   {% set mcr = wf.most_concerning_region if wf.most_concerning_region is mapping else {} %}
+  {% set mcr_rh = mcr.get('minimum_rh_percent') if mcr is mapping else none %}
+  {% set mcr_gust = mcr.get('peak_gust_mph') if mcr is mapping else none %}
   {% set regions = wf.regions if (wf.regions is iterable and wf.regions is not string) else [] %}
 
   {% set incidents = snapshot.priority_incidents if snapshot.priority_incidents else [] %}
@@ -32,6 +34,11 @@
   {% set cached = health.cached if health.cached is not none else 0 %}
 
   {% set prevention = snapshot.todays_prevention_focus['items'] if (snapshot.todays_prevention_focus is mapping and 'items' in snapshot.todays_prevention_focus) else [] %}
+  {% set grants = snapshot.grants_watch['items'] if (snapshot.grants_watch is mapping and 'items' in snapshot.grants_watch) else [] %}
+  {% set grants_meta = snapshot.grants_watch if snapshot.grants_watch is mapping else {} %}
+  {% set news = snapshot.relevant_news['items'] if (snapshot.relevant_news is mapping and 'items' in snapshot.relevant_news) else [] %}
+  {% set news_meta = snapshot.relevant_news if snapshot.relevant_news is mapping else {} %}
+  {% set news_sources = snapshot.relevant_news.source_status if (snapshot.relevant_news is mapping and snapshot.relevant_news.source_status is iterable and snapshot.relevant_news.source_status is not string) else [] %}
   {% set changes = snapshot.change_tracking['items'] if (snapshot.change_tracking is mapping and 'items' in snapshot.change_tracking) else [] %}
 
   {% set community = snapshot.community_intelligence if snapshot.community_intelligence is mapping else {} %}
@@ -190,6 +197,8 @@
       <div class="command-nav__inner" role="tablist">
         <button class="tab-btn is-active" role="tab" data-tab="overview">Overview</button>
         <button class="tab-btn" role="tab" data-tab="incidents">Incidents <span class="count">{{ incidents|length }}</span></button>
+        <button class="tab-btn" role="tab" data-tab="grants">Grants <span class="count">{{ grants|length }}</span></button>
+        <button class="tab-btn" role="tab" data-tab="news">News <span class="count">{{ news|length }}</span></button>
         <button class="tab-btn" role="tab" data-tab="map">Map</button>
         <button class="tab-btn" role="tab" data-tab="intel">Intel <span class="count">{{ intel_total + (review_items|length) }}</span></button>
         <button class="tab-btn" role="tab" data-tab="actions">Actions <span class="count">{{ prevention|length }}</span></button>
@@ -212,10 +221,10 @@
             </div>
             <p class="situation__summary">
               {% if lead %}{{ lead.name }} is {{ (lead.incident_status or 'active')|lower }} in {{ lead.county }} County.{% else %}No active San Diego County incident is verified.{% endif %}
-              {% if mcr.region %} {{ mcr.region }}-zone fire weather is the primary driver, with minimum RH near {{ mcr.minimum_rh_percent }}% and peak gusts near {{ mcr.peak_gust_mph|round|int if mcr.peak_gust_mph is not none else '—' }} mph.{% endif %}
+              {% if mcr.region %} {{ mcr.region }}-zone fire weather is the primary driver, with minimum RH near {{ mcr_rh if mcr_rh is not none else '—' }}% and peak gusts near {{ mcr_gust|round|int if mcr_gust is not none else '—' }} mph.{% endif %}
             </p>
             <div class="situation__grid">
-              <div class="situation__cell"><span class="k">Primary driver</span><span class="v">{% if mcr.region %}{{ mcr.region }} zone — RH ~{{ mcr.minimum_rh_percent }}%, gust ~{{ mcr.peak_gust_mph|round|int if mcr.peak_gust_mph is not none else '—' }} mph{% else %}Not reported{% endif %}</span></div>
+              <div class="situation__cell"><span class="k">Primary driver</span><span class="v">{% if mcr.region %}{{ mcr.region }} zone — RH ~{{ mcr_rh if mcr_rh is not none else '—' }}%, gust ~{{ mcr_gust|round|int if mcr_gust is not none else '—' }} mph{% else %}Not reported{% endif %}</span></div>
               <div class="situation__cell"><span class="k">Recommended action</span><span class="v">{{ prevention[0].title if prevention else 'Maintain prevention messaging' }}</span></div>
               <div class="situation__cell"><span class="k">Confidence</span><span class="v">{% if stale or failed %}Verify cached items{% if stale %} ({{ stale }} stale){% endif %}{% else %}Verified — sources healthy{% endif %}</span></div>
               <div class="situation__cell"><span class="k">Last verified</span><span class="v">{{ (svs.last_successful_dashboard_update or snapshot.get('generated_at'))|friendly_time }}</span></div>
@@ -236,10 +245,10 @@
               <div class="value">{{ lead.name if lead else 'None' }}</div>
               <div class="sublabel">{{ (lead.county ~ ' County') if lead else 'No active incident' }}</div>
             </div>
-            <div class="metric-tile {{ 'sev-critical' if (mcr.minimum_rh_percent is not none and mcr.minimum_rh_percent <= 10) else 'sev-elevated' if mcr.region else '' }}">
+            <div class="metric-tile {{ 'sev-critical' if (mcr_rh is not none and mcr_rh <= 10) else 'sev-elevated' if mcr.region else '' }}">
               <div class="label">Priority zone</div>
               <div class="value">{{ mcr.region or 'N/A' }}</div>
-              <div class="sublabel">{% if mcr.minimum_rh_percent is not none %}min RH {{ mcr.minimum_rh_percent }}%{% else %}Not reported{% endif %}</div>
+              <div class="sublabel">{% if mcr_rh is not none %}min RH {{ mcr_rh }}%{% else %}Not reported{% endif %}</div>
             </div>
             <div class="metric-tile {{ 'sev-critical' if failed else ('sev-elevated' if stale else 'sev-normal') }}">
               <div class="label">Source status</div>
@@ -304,6 +313,54 @@
                 {{ weather_drivers(regions) }}
               </div>
 
+              <div class="card ov-grants">
+                <div class="card__head"><h3>Grant watch</h3><button type="button" class="link-more" data-goto="grants">View all</button></div>
+                {% if grants %}
+                <div class="intel-queue">
+                  {% for item in grants[:2] %}
+                  <div class="intel-item">
+                    <div class="intel-item__top">
+                      <span class="intel-item__title">{{ item.title }}</span>
+                      <span class="badge {{ badge_priority(item.display_status or item.status) }}">{{ item.display_status or item.status or 'Monitor' }}</span>
+                    </div>
+                    <div class="intel-item__meta">
+                      <span><span class="k">Sponsor</span> {{ item.sponsor or 'Official source' }}</span>
+                      <span><span class="k">Deadline</span> {{ item.deadline|friendly_time if item.deadline else 'Monitor official page' }}</span>
+                    </div>
+                    <p class="intel-item__use"><b>Why SDFD fits:</b> {{ item.candidate_reason or item.fit_summary or 'No rationale captured.' }}</p>
+                    {% if item.url %}<p class="intel-item__use"><a href="{{ item.url }}" target="_blank" rel="noreferrer">Open official page</a></p>{% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty"><strong>No grant watch items</strong><span>No SDFD-relevant grant opportunities are in the current public snapshot.</span></div>
+                {% endif %}
+              </div>
+
+              <div class="card ov-news">
+                <div class="card__head"><h3>Relevant news</h3><button type="button" class="link-more" data-goto="news">View all</button></div>
+                {% if news %}
+                <div class="intel-queue">
+                  {% for item in news[:3] %}
+                  <div class="intel-item">
+                    <div class="intel-item__top">
+                      <span class="intel-item__title">{{ item.title }}</span>
+                      <span class="badge {{ 'verified' if item.source_type == 'official' else 'review' }}">{{ item.source_type|title if item.source_type else 'Media' }}</span>
+                    </div>
+                    <div class="intel-item__meta">
+                      <span><span class="k">Source</span> {{ item.publisher or item.source_label or 'News feed' }}</span>
+                      <span><span class="k">Published</span> {{ item.published_at|friendly_time }}</span>
+                    </div>
+                    {% if item.summary %}<p class="intel-item__use">{{ item.summary }}</p>{% endif %}
+                    {% if item.url %}<p class="intel-item__use"><a href="{{ item.url }}" target="_blank" rel="noreferrer">Open article</a></p>{% endif %}
+                  </div>
+                  {% endfor %}
+                </div>
+                {% else %}
+                <div class="empty"><strong>No news items</strong><span>No wildfire / SDFD / adjacent-AHJ news items are in the current public snapshot.</span></div>
+                {% endif %}
+              </div>
+
               <div class="card ov-community">
                 <div class="card__head"><h3>Community intel</h3><button type="button" class="link-more" data-goto="intel">View all</button></div>
                 <div class="trust-note">Community reports are awareness signals only. Confirm with official sources before operational use.</div>
@@ -343,6 +400,91 @@
         <div class="card">
           <div class="card__head"><h3>Active incidents <span class="count-chip">{{ incidents|length }} tracked</span></h3></div>
           {{ incident_table(incidents, 'all-inc') }}
+        </div>
+      </section>
+
+      {# ===================== GRANTS ===================== #}
+      <section class="tab-panel" data-tab-panel="grants">
+        <div class="card">
+          <div class="card__head"><h3>Grant watch <span class="count-chip">{{ grants|length }} tracked</span></h3></div>
+          {% if grants_meta.disclaimer %}<div class="trust-note">{{ grants_meta.disclaimer }}</div>{% endif %}
+          {% if grants %}
+          <div class="intel-queue">
+            {% for item in grants %}
+            <div class="intel-item">
+              <div class="intel-item__top">
+                <span class="intel-item__title">{{ item.title }}</span>
+                <span class="badge {{ badge_priority(item.display_status or item.status) }}">{{ item.display_status or item.status or 'Monitor' }}</span>
+              </div>
+              <div class="intel-item__meta">
+                <span><span class="k">Sponsor</span> {{ item.sponsor or 'Official source' }}</span>
+                <span><span class="k">Deadline</span> {{ item.deadline|friendly_time if item.deadline else 'Monitor official page' }}</span></span>
+                {% set days_until_deadline = item.get('days_until_deadline') if item is mapping else none %}
+                {% if days_until_deadline is not none %}<span><span class="k">Clock</span> {% if days_until_deadline < 0 %}Passed {{ days_until_deadline|abs }} day(s) ago{% elif days_until_deadline == 0 %}Due today{% else %}{{ days_until_deadline }} day(s) remaining{% endif %}</span>{% endif %}
+              </div>
+              {% if item.fit_summary %}<p class="intel-item__use"><b>Fit:</b> {{ item.fit_summary }}</p>{% endif %}
+              {% if item.candidate_reason %}<p class="intel-item__use"><b>Why SDFD fits:</b> {{ item.candidate_reason }}</p>{% endif %}
+              {% if item.partnership_angle %}<p class="intel-item__use"><b>Partnership angle:</b> {{ item.partnership_angle }}</p>{% endif %}
+              {% if item.action_note %}<p class="intel-item__use"><b>Action note:</b> {{ item.action_note }}</p>{% endif %}
+              <p class="intel-item__use">
+                {% if item.url %}<a href="{{ item.url }}" target="_blank" rel="noreferrer">Official page</a>{% endif %}
+                {% if item.program_page %} · <a href="{{ item.program_page }}" target="_blank" rel="noreferrer">Program hub</a>{% endif %}
+              </p>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="empty"><strong>No grant watch items</strong><span>No SDFD-relevant grant opportunities are in the current public snapshot.</span></div>
+          {% endif %}
+        </div>
+      </section>
+
+      {# ===================== NEWS ===================== #}
+      <section class="tab-panel" data-tab-panel="news">
+        <div class="stack">
+          <div class="card">
+            <div class="card__head"><h3>Relevant news <span class="count-chip">{{ news|length }} items</span></h3></div>
+            {% if news_meta.disclaimer %}<div class="trust-note">{{ news_meta.disclaimer }}</div>{% endif %}
+            {% if news %}
+            <div class="intel-queue">
+              {% for item in news %}
+              <div class="intel-item">
+                <div class="intel-item__top">
+                  <span class="intel-item__title">{{ item.title }}</span>
+                  <span class="badge {{ 'verified' if item.source_type == 'official' else 'review' }}">{{ item.source_type|title if item.source_type else 'Media' }}</span>
+                </div>
+                <div class="intel-item__meta">
+                  <span><span class="k">Publisher</span> {{ item.publisher or item.source_label or 'News feed' }}</span>
+                  <span><span class="k">Published</span> {{ item.published_at|friendly_time }}</span>
+                  {% if item.topic_score is not none %}<span><span class="k">Relevance</span> {{ item.topic_score }}</span>{% endif %}
+                </div>
+                {% if item.summary %}<p class="intel-item__use">{{ item.summary }}</p>{% endif %}
+                {% if item.url %}<p class="intel-item__use"><a href="{{ item.url }}" target="_blank" rel="noreferrer">Open article</a></p>{% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty"><strong>No news items</strong><span>No wildfire / SDFD / adjacent-AHJ news items are in the current public snapshot.</span></div>
+            {% endif %}
+          </div>
+
+          <div class="card">
+            <div class="card__head"><h3>News source diagnostics <span class="count-chip">{{ news_sources|length }} feeds</span></h3></div>
+            {% if news_sources %}
+            <div class="source-list">
+              {% for s in news_sources %}
+              <div class="source-line">
+                <span class="source-line__name">{{ s.label or s.source_key or 'News source' }}</span>
+                {{ source_status_badge(s) }}
+                <span class="source-line__meta">Checked {{ (s.last_checked_at or s.last_success_at)|friendly_time }} · saw {{ s.items_seen if s.items_seen is not none else '—' }} items</span>
+                {% if s.warning %}<span class="source-line__err">Warning: {{ s.warning }}</span>{% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty"><strong>No diagnostics</strong><span>No news source diagnostics are in the current public snapshot.</span></div>
+            {% endif %}
+          </div>
         </div>
       </section>
 

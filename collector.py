@@ -24,6 +24,8 @@ KEEP_KEYS = [
     'san_diego_fire_weather',
     'priority_incidents',
     'todays_prevention_focus',
+    'grants_watch',
+    'relevant_news',
     'dashboard_config',
     'change_tracking',
     'source_and_verification_status',
@@ -78,6 +80,19 @@ def sample_payload() -> dict:
         'todays_prevention_focus': {
             'label': 'Suggested prevention considerations — not incident commands or official directives',
             'items': [],
+        },
+        'grants_watch': {
+            'label': 'Grant watchlist for SDFD-aligned wildfire prevention work',
+            'generated_at': now,
+            'disclaimer': 'Curated official grant shortlist for operational awareness. Verify eligibility, deadlines, and current solicitation language on the official source page before action.',
+            'items': [],
+        },
+        'relevant_news': {
+            'label': 'Relevant SDFD / adjacent-AHJ / wildfire news',
+            'generated_at': now,
+            'disclaimer': 'Awareness feed only. Use official incident, weather, and evacuation sources for operational decisions.',
+            'items': [],
+            'source_status': [],
         },
         'dashboard_config': {
             'description': 'Dashboard thresholds and map defaults for the public viewer.',
@@ -156,6 +171,10 @@ def normalize_payload(raw: dict) -> dict:
         payload['change_tracking'] = deepcopy(baseline['change_tracking'])
     if not isinstance(payload.get('todays_prevention_focus'), dict):
         payload['todays_prevention_focus'] = deepcopy(baseline['todays_prevention_focus'])
+    if not isinstance(payload.get('grants_watch'), dict):
+        payload['grants_watch'] = deepcopy(baseline['grants_watch'])
+    if not isinstance(payload.get('relevant_news'), dict):
+        payload['relevant_news'] = deepcopy(baseline['relevant_news'])
     if not isinstance(payload.get('dashboard_config'), dict):
         payload['dashboard_config'] = deepcopy(baseline['dashboard_config'])
     if not isinstance(payload.get('community_intelligence'), dict):
