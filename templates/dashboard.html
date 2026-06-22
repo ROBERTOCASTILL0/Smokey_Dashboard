@@ -17,7 +17,7 @@
       <div class="command-bar__right">
         <div class="stamp">
           <span class="stamp__label">Last refresh</span>
-          <strong>{{ snapshot.get('last_successful_dashboard_update') or snapshot.get('generated_at') }}</strong>
+          <strong>{{ (snapshot.get('last_successful_dashboard_update') or snapshot.get('generated_at'))|friendly_time }}</strong>
         </div>
         <form method="post" action="{{ url_for('logout') }}">
           <button class="ghost-button" type="submit">Log out</button>
@@ -60,7 +60,7 @@
         <div class="hero-panel__main">
           <div class="hero-meta-row">
             <span class="hero-tag">Verified snapshot</span>
-            <span class="hero-meta">Generated {{ snapshot.get('generated_at') }}</span>
+            <span class="hero-meta">Generated {{ snapshot.get('generated_at')|friendly_time }}</span>
             <span class="hero-meta">Confidence {{ confidence }}</span>
           </div>
           <h2>{{ snapshot.executive_summary.headline if snapshot.executive_summary is mapping else 'Wildland conditions overview' }}</h2>
@@ -120,7 +120,7 @@
             <div class="stat-row">
               <span>{{ incident.acreage }} acres</span>
               <span>{{ incident.containment }}% contained</span>
-              {% if incident.updated_at %}<span>{{ incident.updated_at }}</span>{% endif %}
+              {% if incident.updated_at %}<span>{{ incident.updated_at|friendly_time }}</span>{% endif %}
             </div>
             <p>{{ incident.why_it_matters }}</p>
             {% if incident.evacuation_status %}<p class="muted-text"><strong>Evacuation:</strong> {{ incident.evacuation_status }}</p>{% endif %}
@@ -144,7 +144,7 @@
           </div>
         </div>
         {% if snapshot.change_tracking.available and change_items %}
-          <p class="muted-text">Change window: {{ snapshot.change_tracking.since }} → {{ snapshot.last_successful_dashboard_update }}</p>
+          <p class="muted-text">Change window: {{ snapshot.change_tracking.since|friendly_time }} → {{ snapshot.last_successful_dashboard_update|friendly_time }}</p>
           <ul class="brief-list">
             {% for item in change_items[:5] %}
             <li><strong>{{ item.severity|upper if item.severity else 'INFO' }}</strong> — {{ item.text }}</li>
@@ -369,9 +369,9 @@
           <article class="detail-card"><span class="snapshot-label">Failed</span><strong>{{ source_health.failed if source_health.failed is not none else 0 }}</strong></article>
         </div>
         <ul class="brief-list small-gap">
-          <li>Dashboard update: {{ snapshot.source_and_verification_status.last_successful_dashboard_update }}</li>
-          <li>CAL FIRE check: {{ snapshot.source_and_verification_status.last_successful_calfire_check or 'n/a' }}</li>
-          <li>NWS check: {{ snapshot.source_and_verification_status.last_successful_nws_check or 'n/a' }}</li>
+          <li>Dashboard update: {{ snapshot.source_and_verification_status.last_successful_dashboard_update|friendly_time }}</li>
+          <li>CAL FIRE check: {{ snapshot.source_and_verification_status.last_successful_calfire_check|friendly_time }}</li>
+          <li>NWS check: {{ snapshot.source_and_verification_status.last_successful_nws_check|friendly_time }}</li>
         </ul>
         {% if snapshot.source_and_verification_status.sources %}
         <details class="diagnostics">

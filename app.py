@@ -4,8 +4,9 @@ from __future__ import annotations
 import hmac
 import json
 import os
-from datetime import timedelta
+from datetime import datetime, timedelta, timezone
 from functools import wraps
+from zoneinfo import ZoneInfo
 
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
@@ -28,6 +29,34 @@ SECURITY_HEADERS = {
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
     'Cache-Control': 'private, no-store',
 }
+DISPLAY_TZ_NAME = os.environ.get('DISPLAY_TIMEZONE', 'America/Los_Angeles')
+DISPLAY_TZ = ZoneInfo(DISPLAY_TZ_NAME)
+
+
+def _parse_timestamp(value: str | None):
+    if not value or not isinstance(value, str):
+        return None
+    text = value.strip()
+    try:
+        dt = datetime.fromisoformat(text.replace('Z', '+00:00'))
+    except ValueError:
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(DISPLAY_TZ)
+
+
+def format_timestamp(value: str | None, fallback: str = 'n/a') -> str:
+    dt = _parse_timestamp(value)
+    if not dt:
+        return fallback if value in (None, '') else str(value)
+    label = dt.strftime('%a, %b %-d · %-I:%M %p').replace('AM', 'am').replace('PM', 'pm')
+    return f'{label} {dt.tzname()}'
+
+
+@app.template_filter('friendly_time')
+def friendly_time_filter(value):
+    return format_timestamp(value)
 
 
 @app.after_request
