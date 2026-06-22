@@ -14,23 +14,10 @@ services:
       - key: ACCESS_PIN
         sync: false
       - key: SESSION_HOURS
-        value: 24
-      - key: SOURCE_STATUS_URL
+        value: '24'
+      - key: PUSH_TOKEN
         sync: false
-      - key: SOURCE_STATUS_BEARER_TOKEN
-        sync: false
-      - key: REFRESH_TOKEN
-        sync: false
-  - type: cron
-    name: wildland-dashboard-refresh
-    runtime: python
-    plan: free
-    region: oregon
-    schedule: '*/30 * * * *'
-    buildCommand: pip install -r requirements.txt
-    startCommand: python trigger_refresh.py
-    envVars:
-      - key: APP_BASE_URL
-        sync: false
-      - key: REFRESH_TOKEN
-        sync: false
+      - key: SESSION_COOKIE_SECURE
+        value: 'true'
+      - key: MAX_SNAPSHOT_BYTES
+        value: 1048576

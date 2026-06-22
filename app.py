@@ -10,15 +10,16 @@ from zoneinfo import ZoneInfo
 
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
-from collector import SNAPSHOT_PATH, refresh_snapshot, sample_payload
+from collector import SNAPSHOT_PATH, normalize_payload, sample_payload, write_snapshot
 
 app = Flask(__name__)
 app.config.update(
     SECRET_KEY=os.environ.get('SECRET_KEY', 'dev-secret-key'),
     JSON_SORT_KEYS=False,
+    MAX_CONTENT_LENGTH=int(os.environ.get('MAX_SNAPSHOT_BYTES', str(1024 * 1024))),
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE='Lax',
-    SESSION_COOKIE_SECURE=False,
+    SESSION_COOKIE_SECURE=(os.environ.get('SESSION_COOKIE_SECURE', 'true').strip().lower() not in {'0', 'false', 'no'}),
     PERMANENT_SESSION_LIFETIME=timedelta(hours=int(os.environ.get('SESSION_HOURS', '24'))),
 )
 
@@ -85,9 +86,34 @@ def pin_matches(candidate: str) -> bool:
     return bool(target) and hmac.compare_digest(candidate.strip(), target)
 
 
-def refresh_token_matches(candidate: str) -> bool:
-    token = (os.environ.get('REFRESH_TOKEN') or '').strip()
+def push_token_matches(candidate: str) -> bool:
+    token = (os.environ.get('PUSH_TOKEN') or '').strip()
     return bool(token) and hmac.compare_digest(candidate.strip(), token)
+
+
+def validate_push_payload(payload: dict) -> str | None:
+    required_str_fields = ('generated_at', 'last_successful_dashboard_update')
+    for field in required_str_fields:
+        value = payload.get(field)
+        if not isinstance(value, str) or not value.strip():
+            return f'invalid_{field}'
+
+    typed_fields = {
+        'priority_incidents': list,
+        'dashboard_config': dict,
+        'source_and_verification_status': dict,
+        'community_intelligence': dict,
+        'change_tracking': dict,
+        'san_diego_fire_weather': dict,
+        'current_wildland_posture': dict,
+        'todays_prevention_focus': dict,
+        'executive_summary': dict,
+    }
+    for field, expected_type in typed_fields.items():
+        value = payload.get(field)
+        if value is not None and not isinstance(value, expected_type):
+            return f'invalid_{field}'
+    return None
 
 
 def login_required(view):
@@ -99,11 +125,11 @@ def login_required(view):
     return wrapped
 
 
-def refresh_required(view):
+def push_required(view):
     @wraps(view)
     def wrapped(*args, **kwargs):
-        token = (request.headers.get('X-Refresh-Token') or '').strip()
-        if not refresh_token_matches(token):
+        token = (request.headers.get('X-Push-Token') or '').strip()
+        if not push_token_matches(token):
             return jsonify({'ok': False, 'error': 'forbidden'}), 403
         return view(*args, **kwargs)
     return wrapped
@@ -147,16 +173,37 @@ def api_status():
     return jsonify(load_snapshot())
 
 
-@app.post('/internal/refresh')
-@refresh_required
-def internal_refresh():
-    snapshot = refresh_snapshot()
-    return jsonify({'ok': True, 'generated_at': snapshot.get('generated_at'), 'incident_count': len(snapshot.get('priority_incidents') or [])})
+@app.post('/internal/push-snapshot')
+@push_required
+def internal_push_snapshot():
+    payload = request.get_json(silent=True)
+    if not isinstance(payload, dict):
+        return jsonify({'ok': False, 'error': 'invalid_json_object'}), 400
+    validation_error = validate_push_payload(payload)
+    if validation_error:
+        return jsonify({'ok': False, 'error': validation_error}), 400
+    normalized = normalize_payload(payload)
+    normalized['collector'] = {
+        'refreshed_at': datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
+        'mode': 'hermes-push',
+    }
+    write_snapshot(normalized)
+    return jsonify({
+        'ok': True,
+        'generated_at': normalized.get('generated_at'),
+        'incident_count': len(normalized.get('priority_incidents') or []),
+        'mode': 'hermes-push',
+    })
 
 
 @app.errorhandler(404)
 def not_found(_err):
     return jsonify({'ok': False, 'error': 'not found'}), 404
+
+
+@app.errorhandler(413)
+def payload_too_large(_err):
+    return jsonify({'ok': False, 'error': 'payload_too_large'}), 413
 
 
 @app.errorhandler(500)
