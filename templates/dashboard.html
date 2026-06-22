@@ -19,65 +19,58 @@
       </form>
     </header>
 
+    <nav class="section-nav" aria-label="Dashboard sections">
+      <a class="chip-link" href="#overview">Overview</a>
+      <a class="chip-link" href="#incidents">Incidents</a>
+      <a class="chip-link" href="#changes">Changes</a>
+      <a class="chip-link" href="#map-section">Map</a>
+      <a class="chip-link" href="#indicators">Decision indicators</a>
+      <a class="chip-link" href="#context">Additional context</a>
+      <a class="chip-link" href="#sources">Sources</a>
+    </nav>
+
     <main class="page">
-      <section class="hero card card-hero">
+      <section id="overview" class="hero card card-hero">
+        <div class="hero-topline">
+          <span class="eyebrow">Verified snapshot</span>
+          <span class="subtle">{{ snapshot.get('generated_at') }}</span>
+        </div>
         <p class="status-pill {{ (snapshot.executive_summary.severity if snapshot.executive_summary is mapping else 'gray')|lower }}">{{ snapshot.executive_summary.posture if snapshot.executive_summary is mapping else 'Unknown' }}</p>
         <h2>{{ snapshot.executive_summary.headline if snapshot.executive_summary is mapping else 'Wildland conditions overview' }}</h2>
         <p>{{ snapshot.executive_summary.text if snapshot.executive_summary is mapping else 'No summary available.' }}</p>
+
+        {% set lead_incident = (snapshot.priority_incidents[0] if snapshot.priority_incidents else None) %}
+        {% set healthy_sources = snapshot.source_and_verification_status.source_health_summary.healthy if snapshot.source_and_verification_status is mapping and snapshot.source_and_verification_status.source_health_summary is mapping and snapshot.source_and_verification_status.source_health_summary.healthy is not none else snapshot.source_and_verification_status.healthy_sources %}
+        <section class="mini-kpi-grid" aria-label="Catch-up snapshot">
+          <article class="mini-kpi">
+            <span class="mini-label">Nearest fire</span>
+            <strong>{{ lead_incident.name if lead_incident else 'None surfaced' }}</strong>
+            <span class="subtle">{{ lead_incident.location if lead_incident else 'No active incident in snapshot' }}</span>
+          </article>
+          <article class="mini-kpi">
+            <span class="mini-label">Active incidents</span>
+            <strong>{{ snapshot.priority_incidents|length }}</strong>
+            <span class="subtle">currently relevant</span>
+          </article>
+          <article class="mini-kpi">
+            <span class="mini-label">What changed</span>
+            <strong>{{ 'Available' if snapshot.change_tracking.available else 'No material change' }}</strong>
+            <span class="subtle">{{ snapshot.change_tracking.since if snapshot.change_tracking.available else 'Compared with previous successful update' }}</span>
+          </article>
+          <article class="mini-kpi">
+            <span class="mini-label">Source health</span>
+            <strong>{{ healthy_sources if healthy_sources is not none else '—' }} healthy</strong>
+            <span class="subtle">{{ snapshot.source_and_verification_status.delayed_or_failing_sources or 0 }} delayed/failing</span>
+          </article>
+        </section>
       </section>
 
-      <section class="grid two-up">
-        <article class="card">
-          <h3>Current posture</h3>
-          <p class="metric">{{ snapshot.current_wildland_posture.status }}</p>
-          <p>{{ snapshot.current_wildland_posture.explanation }}</p>
-          {% if snapshot.current_wildland_posture.supporting_factors %}
-          <ul class="compact-list">
-            {% for item in snapshot.current_wildland_posture.supporting_factors[:4] %}
-            <li>{{ item }}</li>
-            {% endfor %}
-          </ul>
-          {% endif %}
-        </article>
-
-        <article class="card">
-          <h3>What changed</h3>
-          {% set changes = snapshot.change_tracking['items'] if snapshot.change_tracking is mapping and 'items' in snapshot.change_tracking else [] %}
-          {% if snapshot.change_tracking.available and changes %}
-            <p class="subtle">Change window starts {{ snapshot.change_tracking.since }}</p>
-            <ul class="compact-list">
-              {% for item in changes[:5] %}
-              <li><strong>{{ item.severity|upper if item.severity else 'INFO' }}</strong> — {{ item.text }}</li>
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p>No significant change items in the current snapshot.</p>
-          {% endif %}
-        </article>
-      </section>
-
-      <section class="card">
+      <section id="incidents" class="card">
         <div class="section-head">
-          <h3>Operational fire weather</h3>
-          <span class="subtle">{{ snapshot.san_diego_fire_weather.red_flag_or_watch_status }}</span>
-        </div>
-        <p>{{ snapshot.san_diego_fire_weather.plain_language_summary }}</p>
-        {% set weather_items = snapshot.san_diego_fire_weather.operational_summary['items'] if snapshot.san_diego_fire_weather is mapping and snapshot.san_diego_fire_weather.operational_summary is mapping and 'items' in snapshot.san_diego_fire_weather.operational_summary else [] %}
-        <div class="stack weather-items">
-          {% for item in weather_items[:6] %}
-          <div class="mini-card">
-            <p class="mini-label">{{ item.label }}</p>
-            <p>{{ item.value }}</p>
-          </div>
-          {% endfor %}
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="section-head">
-          <h3>Priority incidents</h3>
+          <h3>Active incidents</h3>
           <span class="subtle">{{ snapshot.priority_incidents|length }} tracked</span>
         </div>
+        <p class="subtle section-copy">The most operationally relevant incident information, condensed for fast scan.</p>
         {% if snapshot.priority_incidents %}
         <div class="stack incidents">
           {% for incident in snapshot.priority_incidents %}
@@ -94,6 +87,7 @@
               <span>{{ incident.containment }}% contained</span>
             </div>
             <p>{{ incident.why_it_matters }}</p>
+            {% if incident.evacuation_status %}<p class="subtle"><strong>Evacuation:</strong> {{ incident.evacuation_status }}</p>{% endif %}
             {% if incident.official_source_link %}
             <p><a href="{{ incident.official_source_link }}" target="_blank" rel="noreferrer">Official source</a></p>
             {% endif %}
@@ -105,18 +99,90 @@
         {% endif %}
       </section>
 
-      <section class="card">
+      <section id="changes" class="card">
+        <div class="section-head">
+          <h3>What changed since last update</h3>
+          <span class="subtle">Compared with the previous successful dashboard snapshot</span>
+        </div>
+        {% set changes = snapshot.change_tracking['items'] if snapshot.change_tracking is mapping and 'items' in snapshot.change_tracking else [] %}
+        {% if snapshot.change_tracking.available and changes %}
+          <p class="subtle">Change window: {{ snapshot.change_tracking.since }} → {{ snapshot.last_successful_dashboard_update }}</p>
+          <ul class="compact-list">
+            {% for item in changes[:5] %}
+            <li><strong>{{ item.severity|upper if item.severity else 'INFO' }}</strong> — {{ item.text }}</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p>{{ snapshot.change_tracking.message if snapshot.change_tracking is mapping and snapshot.change_tracking.message else 'No meaningful change recorded since the previous successful refresh.' }}</p>
+        {% endif %}
+      </section>
+
+      <section id="map-section" class="card">
         <div class="section-head">
           <h3>Map</h3>
           <span class="subtle">Tap markers for incident details</span>
         </div>
+        <p class="subtle section-copy">Incidents and available overlays. Use the incident cards above for the fastest mobile scan.</p>
         <div id="incident-map" class="map"></div>
       </section>
 
-      <section class="card">
+      <section id="indicators" class="card">
         <div class="section-head">
-          <h3>Sources & verification</h3>
-          <span class="subtle">{{ snapshot.source_and_verification_status.healthy_sources }} healthy · {{ snapshot.source_and_verification_status.delayed_or_failing_sources }} delayed/failing</span>
+          <h3>Decision indicators</h3>
+          <span class="subtle">The key signals driving today’s dashboard status</span>
+        </div>
+        <div class="indicator-grid">
+          <article class="mini-card">
+            <p class="mini-label">Overall posture</p>
+            <p class="metric">{{ snapshot.current_wildland_posture.status }}</p>
+            <p>{{ snapshot.current_wildland_posture.explanation }}</p>
+          </article>
+          <article class="mini-card">
+            <p class="mini-label">Fire weather risk</p>
+            <p class="metric">{{ snapshot.executive_summary.risk_level if snapshot.executive_summary is mapping and snapshot.executive_summary.risk_level else snapshot.san_diego_fire_weather.red_flag_or_watch_status }}</p>
+            <p>{{ snapshot.san_diego_fire_weather.plain_language_summary }}</p>
+          </article>
+          <article class="mini-card">
+            <p class="mini-label">Nearest fire to San Diego</p>
+            <p class="metric">{{ lead_incident.name if lead_incident else 'None surfaced' }}</p>
+            <p>{{ lead_incident.location if lead_incident else 'No active incident currently meets configured thresholds.' }}</p>
+          </article>
+          <article class="mini-card">
+            <p class="mini-label">Source confidence</p>
+            <p class="metric">{{ snapshot.executive_summary.confidence if snapshot.executive_summary is mapping and snapshot.executive_summary.confidence else 'Verified' }}</p>
+            <p>{{ healthy_sources if healthy_sources is not none else '—' }} healthy source(s) in the current snapshot.</p>
+          </article>
+        </div>
+      </section>
+
+      <section id="context" class="card">
+        <div class="section-head">
+          <h3>Additional context</h3>
+          <span class="subtle">Weather and deeper snapshot detail</span>
+        </div>
+
+        <details open class="context-block">
+          <summary>Operational fire weather</summary>
+          <div class="details-body">
+            <p class="subtle">{{ snapshot.san_diego_fire_weather.red_flag_or_watch_status }}</p>
+            <p>{{ snapshot.san_diego_fire_weather.plain_language_summary }}</p>
+            {% set weather_items = snapshot.san_diego_fire_weather.operational_summary['items'] if snapshot.san_diego_fire_weather is mapping and snapshot.san_diego_fire_weather.operational_summary is mapping and 'items' in snapshot.san_diego_fire_weather.operational_summary else [] %}
+            <div class="stack weather-items">
+              {% for item in weather_items[:6] %}
+              <div class="mini-card">
+                <p class="mini-label">{{ item.label }}</p>
+                <p>{{ item.value }}</p>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section id="sources" class="card">
+        <div class="section-head">
+          <h3>Source health</h3>
+          <span class="subtle">How reliable the current data is</span>
         </div>
         {% if snapshot.source_and_verification_status.warning %}
         <div class="alert soft">{{ snapshot.source_and_verification_status.warning }}</div>
@@ -126,6 +192,21 @@
           <li>CAL FIRE check: {{ snapshot.source_and_verification_status.last_successful_calfire_check or 'n/a' }}</li>
           <li>NWS check: {{ snapshot.source_and_verification_status.last_successful_nws_check or 'n/a' }}</li>
         </ul>
+        {% if snapshot.source_and_verification_status.sources %}
+        <details class="context-block">
+          <summary>View source diagnostics</summary>
+          <div class="details-body stack">
+            {% for source in snapshot.source_and_verification_status.sources %}
+            <article class="mini-card">
+              <p class="mini-label">{{ source.source_name }}</p>
+              <p>{{ source.display_status or source.status }}</p>
+              <p class="subtle">Age: {{ source.age_minutes if source.age_minutes is not none else 'Unknown' }} min · Expected {{ source.expected_frequency_minutes or '—' }} min</p>
+              {% if source.source_url %}<p><a href="{{ source.source_url }}" target="_blank" rel="noreferrer">Source link</a></p>{% endif %}
+            </article>
+            {% endfor %}
+          </div>
+        </details>
+        {% endif %}
       </section>
     </main>
 
